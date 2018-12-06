@@ -1,5 +1,3 @@
 include *.txt *.md *.rst
-include /docs/*
-include config/*.ini
-include config/*.yaml
-include config/csv/*.csv
+recursive-include docs *
+recursive-include config *
