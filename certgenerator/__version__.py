@@ -1,7 +1,7 @@
 __title__ = 'CertGenerator'
 __description__ = 'Create certificate request'
 __long_description__ = 'README.rst'
-__url__ = ''
+__url__ = 'https://github.com/johndoe-dev/CertGenerator.git'
 __version__ = '2.0.0'
 __build__ = 0x020000
 __author__ = 'Jonathan ULLINDAH'
