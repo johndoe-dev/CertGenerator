@@ -93,7 +93,8 @@ def validate_subject(field):
 
 class Tools:
     def __init__(self):
-        self.basedir = os.path.dirname(here)
+        self.here = here
+        self.basedir = os.path.dirname(self.here)
         self.opts = Options()
         self.config = Config()
         self.about = self.get_app_info()
