@@ -44,6 +44,10 @@ setup(
     install_requires=['click', 'pycparser', 'PyYAML'],
     packages=find_packages(),
     include_package_data=True,
+    package_data={
+        # If any package contains *.ini files, include them
+        '': ['*.ini', '*.yaml', '*.csv']
+    },
     entry_points='''
         [console_scripts]
         cert=certgenerator.cli:main
