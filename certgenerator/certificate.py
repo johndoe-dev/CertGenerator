@@ -28,7 +28,7 @@ class Certificate:
         self.ctx = None
 
         # Set directories path
-        self.basedir = Tools().basedir
+        self.basedir = Tools().here
         self.Documents = Tools().documents
         self.config_folder = self.get_folder(os.path.join(self.basedir, "config"))
         self.app_folder = self.get_folder(Tools().app_folder)
@@ -116,9 +116,9 @@ class Certificate:
         :return:
         """
         # copy all csv file from config to csv folder
-        for _csv_path in glob(os.path.join(self.config_folder, "csv", "*.csv")):
+        for _csv_path in glob(os.path.join(self.config_folder, "*.csv")):
             _csv = _csv_path.split("/")[-1]
-            if not os.path.exists(os.path.join(self.csr_folder, _csv)):
+            if not os.path.exists(os.path.join(self.csv_folder, _csv)):
                 shutil.copy2(_csv_path, self.csv_folder)
 
         # copy yaml file from config to app folder
@@ -624,7 +624,6 @@ class Certificate:
                 self.output("[+] Reading values file: {f}".format(f=_file), level=logging.DEBUG)
                 with open(csv_file) as f:
                     reader = csv.DictReader(f)
-                    print reader.restkey
                     for row in reader:
                         csv_dict.append(row[column])
                 return csv_dict
