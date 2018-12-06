@@ -167,6 +167,9 @@ In **csr.yaml**:
    "SDjhijoklklk"
    "SN654"
 
+Create Certificate
+------------------
+
 Create one certificate
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -206,3 +209,11 @@ Read certificate
 ::
 
    $ cert read [path/of/csr]
+
+
+Links
+-----
+
+-  Releases: https://pypi.org/project/CertGenerator/
+-  Code: https://github.com/johndoe-dev/CertGenerator.git
+
