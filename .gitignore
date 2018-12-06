@@ -1,3 +1,6 @@
 venv/
 .idea/
 .DS_Store
+build/
+CertGenerator.egg-info/
+dist/
