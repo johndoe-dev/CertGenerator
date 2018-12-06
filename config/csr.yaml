@@ -1,0 +1,6 @@
+---
+  C: 'FR'
+  O: 'My Company'
+  OU: '31232343'
+  emailAddress: 'john.doe@my_company.com'
+  san: 'test1.com test2.com'
