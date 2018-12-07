@@ -1,17 +1,22 @@
 import os
 import ConfigParser
+import sys
+sys.path.append(sys.path[0] + "/..")
+from exception import ConfigException
 
 
 class Config:
     def __init__(self):
-        self.basedir = os.path.abspath(os.path.dirname(__file__))
-        self.config_ini = os.path.join(self.basedir, "config.ini")
-
+        self.here = os.path.abspath(os.path.dirname(__file__))
+        self.basedir = os.path.dirname(self.here)
+        self.config_ini = os.path.join(self.here, "config.ini")
         self.config_parser = ConfigParser.RawConfigParser()
+
+    def read_config_ini(self):
         if os.path.exists(self.config_ini):
             self.config_parser.read(self.config_ini)
         else:
-            raise Exception("config File doesn't exist")
+            raise ConfigException("config File {f} doesn't exist".format(f=self.config_ini))
 
     def get_section(self, section=None):
         """
@@ -63,15 +68,14 @@ class Config:
         :param value:
         :return:
         """
-        config = ConfigParser.RawConfigParser()
-        config.read(self.config_ini)
+        self.read_config_ini()
         try:
-            config.add_section(section=section)
+            self.config_parser.add_section(section=section)
         except ConfigParser.DuplicateSectionError:
             pass
-        config.set(section, option, value)
+        self.config_parser.set(section, option, value)
         with open(self.config_ini, "w") as f:
-            config.write(f)
+            self.config_parser.write(f)
 
     def remove_section(self, section):
         """
