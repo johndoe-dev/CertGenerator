@@ -8,17 +8,13 @@ CertGenerator
 Python module to generate key, certificate request and self signed
 certificate
 
-All generated certificate are located in certificate folder
-
 Information
 -----------
 
-This can be used only with python(2.7)
+This can be used only with python2.7
 
 Getting started
 ---------------
-
-Install required modules, pip must be installed
 
 **required** modules:
 ~~~~~~~~~~~~~~~~~~~~~
@@ -27,53 +23,77 @@ Install required modules, pip must be installed
 -  pycparser
 -  PyYAML
 
-installing package using pip_
-
+Installing package using pip_
 
 ::
 
-    $ pip install --editable .
+    $ pip install --user CertGenerator
+
+Add symbolic link
+
+::
+
+    $ sudo ln -s /Users/{user}/Library/Python/2.7/bin/cert /usr/bin/cert
 
 or
 
 ::
 
-   $ pip install -r requirements
+    $ cd /usr/bin
+    $ sudo ln -s /Users/{user}/Library/Python/2.7/bin/cert
+
 
 Usage
 -----
 
 ::
 
-   Usage: cert [OPTIONS] COMMAND [ARGS]...
+    Usage: cli.py [OPTIONS] COMMAND [ARGS]...
 
-     A command line tool to create and read CSR and P12
+      A command line tool to create and read CSR and P12
 
-   Options:
-     -v, --verbose  Display only if necessary
-     -d, --debug    Display all details
-     --version      show version and exit
-     -h, --help     Show this message and exit.
+    Options:
+      -v, --verbose  Display only if necessary
+      -d, --debug    Display all details
+      --version      show version and exit
+      -h, --help     Show this message and exit.
 
-   Commands:
-     config               Edit or read config ini
-     create               Create a single CSR
-     create-multiple      Create multiple certificate using csv file
-     create-multiple-p12  Create multiple p12 using csv file
-     create-p12           Create a simple p12 Need key file and pem file
-     read                 Read csr or p12
+    Commands:
+      config               Edit or read config ini
+      create               Create a single CSR
+      create-multiple      Create multiple certificate using csv file
+      create-multiple-p12  Create multiple p12 using csv file
+      create-p12           Create a simple p12 Need key file and pem file
+      init                 Create certificate folder and default csv file
+      read                 Read csr or p12
 
 On terminal you can use:
 
 ::
 
-   python cert.py [ARGS]
+   $ cert [ARGS]
 
-or
+The folder folder will be created in /Users/{user}/Documents/CertGenerator
 
 ::
 
-   cert [ARGS]
+    .CertGenerator
+    ├── certificate
+    │   ├── csr
+    │   └── p12
+    ├── csr.yaml
+    ├── csv
+    │   └── serial.csv
+    └── log
+        └── certgen.log
+
+You can change default app folder using init arg:
+
+::
+
+    $ cert init -cert {path}
+
+the new folder will be structured the same way
 
 Optional configurations file
 ----------------------------
