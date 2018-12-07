@@ -24,3 +24,10 @@ class ExtensionException(Exception):
     Raise for file extension
     """
     pass
+
+
+class ConfigException(Exception):
+    """
+    Raise config exception
+    """
+    pass
