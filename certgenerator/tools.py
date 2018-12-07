@@ -1,31 +1,34 @@
 import os
 import logging
 import logging.handlers
-import sys
 import click
 import platform
 import shutil
 from codecs import open as c_open
 from config import Config
-import exception
+from exception import *
 
 here = os.path.abspath(os.path.dirname(__file__))
 
 
 def edit_config(cert_folder, csv_file):
+    """
+    add or edit app folder or/and csv_file
+    :param cert_folder:
+    :param csv_file:
+    :return:
+    """
     _config = Tools().get_config()
     base_cert_directory = Tools().app_folder
 
     if cert_folder:
         base_cert_directory = cert_folder
         try:
-            Tools().add_custom_folder(cert_folder, "cert_directory")
-        except exception.PathException as e:
-            click.echo(e)
-            raise click.Abort()
-        except exception.FolderException as e:
-            click.echo(e)
-            raise click.Abort()
+            click.echo(Tools().add_custom_folder(base_cert_directory, "cert_directory"))
+        except PathException as e:
+            Tools().error(e)
+        except FolderException as e:
+            Tools().error(e)
 
     if csv_file:
         try:
@@ -39,9 +42,8 @@ def edit_config(cert_folder, csv_file):
                 if not os.path.exists(csv_folder):
                     os.mkdir(csv_folder)
                 shutil.copy2(csv_file, csv_folder)
-        except exception.ExtensionException as e:
-            click.echo(e)
-            raise click.Abort()
+        except ExtensionException as e:
+            Tools().error(e)
 
 
 def validate_subject(field):
@@ -97,19 +99,17 @@ class Tools:
         self.basedir = os.path.dirname(self.here)
         self.opts = Options()
         self.config = Config()
+        try:
+            self.config.read_config_ini()
+        except ConfigException as e:
+            self.error("{e}\n".format(e=e))
         self.about = self.get_app_info()
         self.documents = os.path.join(os.environ["HOME"], "Documents")
         self.app_folder = os.path.join(self.documents, self.get_app_info("__title__"))
         self.custom_section = "custom"
 
         # Set cert folder
-        try:
-            if "cert_directory" in self.config.get_section(self.custom_section):
-                self.app_folder = self.config.get(self.custom_section, "cert_directory")
-        except KeyError:
-            pass
-        except TypeError:
-            pass
+        self.load_config()
 
     @staticmethod
     def get_app_info(item=None):
@@ -123,7 +123,10 @@ class Tools:
             exec (f.read(), about)
         for i in about:
             if "__long_description__" in i:
-                about[i] = open(about[i]).read()
+                try:
+                    about[i] = open(about[i]).read()
+                except IOError:
+                    about[i] = ""
         if item:
             return about[item]
         return about
@@ -138,6 +141,10 @@ class Tools:
             os.mkdir(self.app_folder)
 
     def load_config(self):
+        """
+        load custom app folder
+        :return:
+        """
         try:
             if "cert_directory" in self.config.get_section(self.custom_section):
                 self.app_folder = self.config.get(self.custom_section, "cert_directory")
@@ -177,8 +184,7 @@ class Tools:
             logger.setLevel(logging.WARNING)
             return logger
         except AttributeError as err:
-            sys.stdout.write("[!] Unable to open log file {f}: {e}\n".format(f=default["log_file"], e=err))
-            sys.exit(1)
+            self.error("[!] Unable to open log file {f}: {e}\n".format(f=default["log_file"], e=err))
 
     def get_config(self, section=None):
         """
@@ -197,14 +203,25 @@ class Tools:
         :param option:
         :return:
         """
+        message = "App directory has been created: {p}".format(p=folder)
         if os.path.exists(folder):
             if os.path.isdir(folder):
                 self.config.add(self.custom_section, option, folder)
-                self.app_folder = folder
+                self.load_config()
+                message = "App directory has been selected: {p}".format(p=folder)
             else:
-                raise exception.FolderException("path: {p} is not a directory".format(p=folder))
+                raise FolderException("path: {p} is not a directory".format(p=folder))
         else:
-            raise exception.PathException("path: {p} doesn't exist".format(p=folder))
+            # raise PathException("path: {p} doesn't exist".format(p=folder))
+            try:
+                os.mkdir(folder)
+                self.config.add(self.custom_section, option, folder)
+                self.load_config()
+            except OSError:
+                self.error("Impossible to create app folder\n"
+                           "Make sure you spell the path well: {p}".format(p=folder))
+
+        return message
 
     def add_custom_file(self, _file, option, ext="txt", absolute=False):
         """
@@ -219,24 +236,29 @@ class Tools:
             if os.path.exists(_file):
                 pass
             else:
-                raise exception.PathException("path: {p} doesn't exist".format(p=_file))
+                raise PathException("path: {p} doesn't exist".format(p=_file))
 
             if os.path.isfile(_file):
                 pass
             else:
-                raise exception.FileException("path: {p} is not a file".format(p=_file))
+                raise FileException("path: {p} is not a file".format(p=_file))
 
         file_name, file_ext = os.path.splitext(_file)
         if ext in file_ext:
             self.config.add(self.custom_section, option, _file.split("/")[-1])
         else:
-            raise exception.ExtensionException("file {f}: Extension {e} is expected, \"{g}\" given"
-                                               .format(f=_file, e=ext, g=file_ext))
+            raise ExtensionException("file {f}: Extension {e} is expected, \"{g}\" given"
+                                     .format(f=_file, e=ext, g=file_ext))
 
     def get_options(self):
         return self.opts
 
     def set_options(self, **kwargs):
+        """
+        edit or add items (key and value) to options
+        :param kwargs:
+        :return:
+        """
         for k, v in kwargs.items():
             if "config" in k and v is True:
                 self.opts.update(config=self.get_config(section="config"))
@@ -249,6 +271,11 @@ class Tools:
                 continue
             if k and v:
                 self.opts[k] = v
+
+    @staticmethod
+    def error(message):
+        click.echo("\n========ERROR========\n{m}\n========ERROR========\n".format(m=message))
+        raise click.Abort
 
 
 class Options(dict):
