@@ -516,7 +516,7 @@ class Certificate:
                     return json.dumps(result, indent=4)
                 return True
             except Exception as e:
-                m = "Failed to read {f}\n {e}\nTry read -t {f}".format(f=path, e=e)
+                m = "Failed to read {f}\n {e}\nTry read {f} -t".format(f=path, e=e)
                 if read:
                     self.output(m, level=logging.ERROR)
                 else:
