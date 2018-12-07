@@ -31,7 +31,6 @@ def init(cert_folder, csv_file):
     Create certificate folder and default csv file
     """
     edit_config(cert_folder, csv_file)
-    click.echo("App directory has been created:\n{}".format(tools.get_certificate_folder()))
 
 
 @main.command()
