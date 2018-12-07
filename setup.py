@@ -31,6 +31,13 @@ if os.path.exists(requirements_file):
         requirements = f.read().splitlines()
 
 
+def long_description():
+    try:
+        return open(about('__long_description__')).read()
+    except IOError:
+        return ""
+
+
 setup(
     name=about('__title__'),
     version=about('__version__'),
@@ -39,7 +46,7 @@ setup(
     author_email=about('__author_email__'),
     url=about('__url__'),
     description=about('__description__'),
-    long_description=open(about('__long_description__')).read(),
+    long_description=long_description(),
     py_modules='cert',
     install_requires=['click', 'pycparser', 'PyYAML'],
     packages=find_packages(),
