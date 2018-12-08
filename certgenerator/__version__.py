@@ -1,5 +1,5 @@
 __title__ = 'CertGenerator'
-__description__ = 'Create certificate request'
+__description__ = 'A simple command line tools to create and read CSR and P12'
 __long_description__ = 'README.rst'
 __url__ = 'https://github.com/johndoe-dev/CertGenerator.git'
 __version__ = '2.1.1'
