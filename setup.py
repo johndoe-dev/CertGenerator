@@ -41,14 +41,13 @@ def long_description():
 setup(
     name=about('__title__'),
     version=about('__version__'),
-    license=about('__license__'),
     author=about('__author__'),
     author_email=about('__author_email__'),
     url=about('__url__'),
     description=about('__description__'),
     long_description=long_description(),
     py_modules='cert',
-    install_requires=['click', 'pycparser', 'PyYAML'],
+    install_requires=['click', 'PyYAML', 'pyOpenSSL'],
     packages=find_packages(),
     include_package_data=True,
     package_data={
@@ -60,6 +59,16 @@ setup(
         cert=certgenerator.cli:main
     ''',
     classifiers=[
-        'Programming Language :: Python :: 2.7'
+        'Development Status :: 5 - Production/Stable',
+        'Intended Audience :: Developers',
+        'Intended Audience :: System Administrators',
+        'Topic :: Security',
+        'Topic :: Utilities',
+        'License :: OSI Approved :: MIT License',
+        'Environment :: MacOS X',
+        'Environment :: Console',
+        'Programming Language :: Python :: 2.7',
+        'Natural Language :: English',
+        'Operating System :: MacOS :: MacOS X'
     ],
 )
