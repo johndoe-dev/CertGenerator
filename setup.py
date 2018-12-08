@@ -59,4 +59,7 @@ setup(
         [console_scripts]
         cert=certgenerator.cli:main
     ''',
+    classifiers=[
+        'Programming Language :: Python :: 2.7'
+    ],
 )
