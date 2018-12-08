@@ -1,4 +1,5 @@
 import click
+import sys
 from tools import validate_subject, Tools
 
 
@@ -20,10 +21,11 @@ def print_version(ctx, param, value):
         return
 
     try:
-        conf = Tools()
-        version = conf.get_app_info("__version__")
-        name = conf.get_app_info("__title__")
-        click.echo("Name: {n}\nVersion: {v}".format(n=name, v=version))
+        tools = Tools()
+        version = tools.get_app_info("__version__")
+        name = tools.get_app_info("__title__")
+        python_version = "{n} {v}".format(n="Python", v=sys.version)
+        click.echo("{n} {v}\n{p}".format(n=name, v=version, p=python_version))
     except KeyError:
         pass
     ctx.exit()
