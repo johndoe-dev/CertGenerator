@@ -1,4 +1,5 @@
 import os
+import csv
 import logging
 import logging.handlers
 import click
@@ -6,7 +7,7 @@ import platform
 import shutil
 from codecs import open as c_open
 from config import Config
-from exception import *
+from cert_exceptions import *
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -18,32 +19,46 @@ def edit_config(cert_folder, csv_file):
     :param csv_file:
     :return:
     """
-    _config = Tools().get_config()
-    base_cert_directory = Tools().app_folder
+    tools = Tools()
+    base_cert_directory = tools.app_folder
+    base_csv_file = tools.config.default_csv_file
 
     if cert_folder:
         base_cert_directory = cert_folder
-        try:
-            click.echo(Tools().add_custom_folder(base_cert_directory, "cert_directory"))
-        except PathException as e:
-            Tools().error(e)
-        except FolderException as e:
-            Tools().error(e)
+
+    add_custom_folder(tools, base_cert_directory, "cert_directory")
 
     if csv_file:
+        base_csv_file = csv_file
+
+    else:
         try:
-            if len(csv_file.split('/')) == 1:
-                Tools().add_custom_file(csv_file, "csvfile", ext="csv")
-                click.echo("add csv: {f} in directory: {d}".format(f=csv_file, d=base_cert_directory))
-            elif len(csv_file.split('/')) > 1:
-                Tools().create_certificate_folder()
-                Tools().add_custom_file(csv_file, "csvfile", ext="csv", absolute=True)
-                csv_folder = os.path.join(base_cert_directory, "csv")
-                if not os.path.exists(csv_folder):
-                    os.mkdir(csv_folder)
-                shutil.copy2(csv_file, csv_folder)
-        except ExtensionException as e:
-            Tools().error(e)
+            base_csv_file = tools.get_config("custom")["csv"]
+        except KeyError:
+            pass
+
+    try:
+        tools.add_custom_file(base_csv_file, "csvfile", ext="csv")
+    except NoFileException as e:
+        tools.error(e)
+    except BadExtensionException as e:
+        tools.error(e)
+
+
+def add_custom_folder(tools, folder, section):
+    """
+    create app folder
+    :param tools:
+    :param folder:
+    :param section:
+    :return:
+    """
+    try:
+        tools.add_custom_folder(folder, section)
+    except BadPathException as e:
+        tools.error(e)
+    except NoFolderException as e:
+        tools.error(e)
 
 
 def validate_subject(field):
@@ -101,13 +116,13 @@ class Tools:
         self.config = Config()
         try:
             self.config.read_config_ini()
-        except ConfigException as e:
+        except NoConfigException as e:
             self.error("{e}\n".format(e=e))
         self.about = self.get_app_info()
         self.documents = os.path.join(os.environ["HOME"], "Documents")
         self.app_folder = os.path.join(self.documents, self.get_app_info("__title__"))
+        self.csv_folder = os.path.join(self.app_folder, "csv")
         self.custom_section = "custom"
-
         # Set cert folder
         self.load_config()
 
@@ -148,6 +163,7 @@ class Tools:
         try:
             if "cert_directory" in self.config.get_section(self.custom_section):
                 self.app_folder = self.config.get(self.custom_section, "cert_directory")
+                self.csv_folder = os.path.join(self.app_folder, "csv")
         except KeyError:
             pass
         except TypeError:
@@ -203,16 +219,15 @@ class Tools:
         :param option:
         :return:
         """
-        message = "App directory has been created: {p}".format(p=folder)
+        message = "App directory created: {p}".format(p=folder)
         if os.path.exists(folder):
             if os.path.isdir(folder):
                 self.config.add(self.custom_section, option, folder)
                 self.load_config()
-                message = "App directory has been selected: {p}".format(p=folder)
+                message = "App directory selected: {p}".format(p=folder)
             else:
-                raise FolderException("path: {p} is not a directory".format(p=folder))
+                raise NoFolderException("path: {p} is not a directory".format(p=folder))
         else:
-            # raise PathException("path: {p} doesn't exist".format(p=folder))
             try:
                 os.mkdir(folder)
                 self.config.add(self.custom_section, option, folder)
@@ -221,34 +236,100 @@ class Tools:
                 self.error("Impossible to create app folder\n"
                            "Make sure you spell the path well: {p}".format(p=folder))
 
-        return message
+        click.echo(message)
 
-    def add_custom_file(self, _file, option, ext="txt", absolute=False):
+    def add_custom_file(self, _file, option, ext="txt"):
         """
         Add custom file in config ini
         :param _file:
         :param option:
         :param ext:
-        :param absolute:
         :return:
         """
+        absolute = True
+        source = ""
+        destination = ""
+        message = ""
+        if len(_file.split("/")) == 1:
+            absolute = False
+        self.load_config()
+
+        if _file == self.config.default_csv_file:
+            # Use default csv
+            try:
+                self.copy_file(_file, self.csv_folder,
+                               message="copy default csv : {s} to {d}"
+                               .format(s=_file.split("/")[-1], d=os.path.join(self.csv_folder, _file.split("/")[-1])))
+            except FileAlreadyExists as e:
+                click.echo("{e} => file selected".format(e=e))
+                self.config.remove_option("custom", "csv_file")
+            return
+
         if absolute:
-            if os.path.exists(_file):
+            if os.path.exists(_file) and os.path.isfile(_file):
+                if self.check_extension(_file, ext):
+                    source = _file
+                    destination = self.csv_folder
+                    message = "copy {s} to {d}"\
+                        .format(s=_file, d=os.path.join(self.csv_folder, _file.split('/')[-1]))
+            else:
+                raise NoFileException("path: {p} doesn't exist".format(p=_file))
+
+        else:
+            if self.check_extension(_file, ext):
+                source = self.config.default_csv_file
+                destination = os.path.join(self.csv_folder, _file.split("/")[-1])
+                message = "add csv: {f} in app directory: {p}"\
+                    .format(f=_file.split("/")[-1], p=self.csv_folder)
+
+        try:
+            self.copy_file(source, destination, message)
+        except FileAlreadyExists as e:
+            click.echo("{e} => file selected".format(e=e))
+
+        self.config.add(self.custom_section, option, _file.split("/")[-1])
+
+    @staticmethod
+    def copy_file(source, destination, message):
+        """
+        copy file
+        :param source:
+        :param destination:
+        :return:
+        """
+        if os.path.isfile(destination):
+            if not os.path.exists(destination):
                 pass
             else:
-                raise PathException("path: {p} doesn't exist".format(p=_file))
-
-            if os.path.isfile(_file):
+                raise FileAlreadyExists("file {p} already exists".format(p=destination))
+        else:
+            if not os.path.exists(os.path.join(destination, source.split("/")[-1])):
                 pass
             else:
-                raise FileException("path: {p} is not a file".format(p=_file))
+                raise FileAlreadyExists("file {p} already exists"
+                                    .format(p=os.path.join(destination, source.split("/")[-1])))
+        shutil.copy2(source, destination)
+        click.echo(message)
 
+    def create_csv_file(self, _file):
+        """
+        Create csv file
+        :param _file:
+        :return:
+        """
+        csv_data = [["serial"], ["1234"]]
+        if not os.path.exists(_file):
+            with open(os.path.join(self.csv_folder, _file), 'w') as csv_file:
+                writer = csv.writer(csv_file)
+                writer.writerows(csv_data)
+
+    @staticmethod
+    def check_extension(_file, ext):
         file_name, file_ext = os.path.splitext(_file)
         if ext in file_ext:
-            self.config.add(self.custom_section, option, _file.split("/")[-1])
-        else:
-            raise ExtensionException("file {f}: Extension {e} is expected, \"{g}\" given"
-                                     .format(f=_file, e=ext, g=file_ext))
+            return True
+        raise BadExtensionException("file {f}: Extension {e} is expected, \"{g}\" given"
+                                    .format(f=_file, e=ext, g=file_ext))
 
     def get_options(self):
         return self.opts
