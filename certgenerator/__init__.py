@@ -1,6 +1,6 @@
 import decorators
 import callbacks
-import exception
+import cert_exceptions
 import test
 from config import Config
 from certificate import Certificate
