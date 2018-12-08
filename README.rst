@@ -27,21 +27,7 @@ Installing package using pip_
 
 ::
 
-    $ pip install --user CertGenerator
-
-Add symbolic link
-
-::
-
-    $ sudo ln -s /Users/{user}/Library/Python/2.7/bin/cert /usr/bin/cert
-
-or
-
-::
-
-    $ cd /usr/bin
-    $ sudo ln -s /Users/{user}/Library/Python/2.7/bin/cert
-
+    $ pip install CertGenerator
 
 Usage
 -----
