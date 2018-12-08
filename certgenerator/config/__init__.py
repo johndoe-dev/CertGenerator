@@ -1,14 +1,18 @@
 import os
 import ConfigParser
-import sys
-sys.path.append(sys.path[0] + "/..")
-from exception import ConfigException
+try:
+    from certgenerator.cert_exceptions import NoConfigException
+except ImportError:
+    import sys
+    sys.path.append("/..")
+    from cert_exceptions import NoConfigException
 
 
 class Config:
     def __init__(self):
         self.here = os.path.abspath(os.path.dirname(__file__))
         self.basedir = os.path.dirname(self.here)
+        self.default_csv_file = os.path.join(self.here, "serial.csv")
         self.config_ini = os.path.join(self.here, "config.ini")
         self.config_parser = ConfigParser.RawConfigParser()
 
@@ -16,7 +20,7 @@ class Config:
         if os.path.exists(self.config_ini):
             self.config_parser.read(self.config_ini)
         else:
-            raise ConfigException("config File {f} doesn't exist".format(f=self.config_ini))
+            raise NoConfigException("config File {f} doesn't exist".format(f=self.config_ini))
 
     def get_section(self, section=None):
         """
@@ -83,11 +87,10 @@ class Config:
         :param section:
         :return:
         """
-        config = ConfigParser.RawConfigParser()
-        config.read(self.config_ini)
-        config.remove_section(section)
+        self.read_config_ini()
+        self.config_parser.remove_section(section)
         with open(self.config_ini, "w") as f:
-            config.write(f)
+            self.config_parser.write(f)
 
     def remove_option(self, section, option):
         """
@@ -96,8 +99,7 @@ class Config:
         :param option:
         :return:
         """
-        config = ConfigParser.RawConfigParser()
-        config.read(self.config_ini)
-        config.remove_option(section, option)
+        self.read_config_ini()
+        self.config_parser.remove_option(section, option)
         with open(self.config_ini, "w") as f:
-            config.write(f)
+            self.config_parser.write(f)
