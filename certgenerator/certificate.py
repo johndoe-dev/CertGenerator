@@ -28,6 +28,8 @@ class Certificate:
         self.ctx = None
 
         # Set directories path
+        self.tools = Tools()
+        self.tools.load_config()
         self.basedir = Tools().here
         self.Documents = Tools().documents
         self.config_folder = self.get_folder(os.path.join(self.basedir, "config"))
@@ -707,13 +709,8 @@ class Certificate:
         :param strip:
         :return:
         """
-        self.output('> ' + cmd, level=logging.DEBUG)
-        process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
-        if process.wait() == 0:
-            if strip:
-                return process.communicate()[0].rstrip()
-            return process.communicate()[0]
-        return ''
+        self.output('> {}'.format(cmd), level=logging.DEBUG)
+        return self.tools.shell(cmd, strip)
 
 
 if __name__ == "__main__":
