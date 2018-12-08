@@ -25,7 +25,7 @@ def main(verbose, debug):
 
 @main.command()
 @decorators.folder_options
-@decorators.csv_options(absolute=False)
+@decorators.csv_options
 def init(cert_folder, csv_file):
     """
     Create certificate folder and default csv file
@@ -58,9 +58,9 @@ def create(logger, ctx, name, config, key_size, san, **subject):
 @main.command()
 @click.pass_context
 @decorators.pass_logger
-@decorators.csv_options()
+@decorators.csv_options
 @decorators.global_options("csr")
-def create_multiple(logger, ctx, csv_file, absolute, config, key_size, san, **subject):
+def create_multiple(logger, ctx, csv_file, config, key_size, san, **subject):
     """
     Create multiple certificate using csv file
     """
@@ -71,7 +71,7 @@ def create_multiple(logger, ctx, csv_file, absolute, config, key_size, san, **su
         cert.load_subject()
 
     if csv_file:
-        cert.generate_multiple(csv_file=csv_file, absolute=absolute)
+        cert.generate_multiple(csv_file=csv_file)
     else:
         cert.generate_multiple()
 
@@ -101,13 +101,13 @@ def create_p12(logger, ctx, name, pem, key, password, config):
 @main.command()
 @click.pass_context
 @decorators.pass_logger
-@decorators.csv_options()
+@decorators.csv_options
 @click.option('-p', '--pem-folder', type=str, help="Define pem folder where all the pem are located")
 @click.option('-k', '--key-folder', type=str,
               help="Define key folder where all the key are located,"
                    " if not defined, it will search key in certificate folder")
 @decorators.global_options("p12")
-def create_multiple_p12(logger, ctx, csv_file, absolute, pem_folder, key_folder, config):
+def create_multiple_p12(logger, ctx, csv_file, pem_folder, key_folder, config):
     """
     Create multiple p12 using csv file
     """
@@ -115,7 +115,7 @@ def create_multiple_p12(logger, ctx, csv_file, absolute, pem_folder, key_folder,
 
     cert = Certificate(logger, opts=tools.opts)
     if csv_file:
-        cert.generate_multiple_p12(csv_file=csv_file, pem_folder=pem_folder, key_folder=key_folder, absolute=absolute)
+        cert.generate_multiple_p12(csv_file=csv_file, pem_folder=pem_folder, key_folder=key_folder)
     else:
         cert.generate_multiple_p12(pem_folder=pem_folder, key_folder=key_folder)
 
@@ -159,7 +159,7 @@ def read():
 
 @config.command()
 @decorators.folder_options
-@decorators.csv_options(absolute=False)
+@decorators.csv_options
 def edit(cert_folder, csv_file):
     """
     Add option in config ini (csr, p12 and csv path)
