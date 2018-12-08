@@ -1,3 +1,12 @@
+v2.1.1 (2018-12-08)
+-------------------
+
+- Version Control (__version__.py)
+
+- Update setup
+	* Update classifiers
+	* Add pyOpenSSL to install_requires
+
 v2.1.0 (2018-12-08)
 -------------------
 
