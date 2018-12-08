@@ -1,33 +1,40 @@
-class FolderException(Exception):
+class NoFolderException(Exception):
     """
     Raise for folder exception
     """
     pass
 
 
-class FileException(Exception):
+class NoFileException(Exception):
     """
     Raise for file exception
     """
     pass
 
 
-class PathException(Exception):
+class BadPathException(Exception):
     """
     Raise for Path exception
     """
     pass
 
 
-class ExtensionException(Exception):
+class BadExtensionException(Exception):
     """
     Raise for file extension
     """
     pass
 
 
-class ConfigException(Exception):
+class NoConfigException(Exception):
     """
     Raise config exception
+    """
+    pass
+
+
+class FileAlreadyExists(Exception):
+    """
+    Raise File already exists exception
     """
     pass
