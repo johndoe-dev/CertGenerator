@@ -44,22 +44,15 @@ def folder_options(f):
     return functools.reduce(lambda x, opt: opt(x), options, f)
 
 
-def csv_options(absolute=True):
-    """Define csv and absolute options
+def csv_options(f):
+    """Define csv options
     """
-    def inner_options(f):
-        options = [
-            click.option('-csv', '--csv-file', type=str,
-                     help="Define csv, if not use '-a', it will use serial.csv (default csv of app)"),
-            click.option('-a', '--absolute', is_flag=True, help="use absolute path of csv"),
-        ]
-        if not absolute:
-            options = [
-                click.option('-csv', '--csv-file', type=str,
-                             help="Define csv file, it will search file in certificate folder"),
-            ]
-        return functools.reduce(lambda x, opt: opt(x), options, f)
-    return inner_options
+    options = [
+        click.option('-csv', '--csv-file', type=str,
+                     help="Define csv file, if only name is defined, it will search in csv folder of app directory"),
+    ]
+
+    return functools.reduce(lambda x, opt: opt(x), options, f)
 
 
 def pass_logger(func):
