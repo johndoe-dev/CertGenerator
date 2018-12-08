@@ -210,16 +210,13 @@ using csv file:
 
 ::
 
-   $ cert create-multiple [-a] [--csv=[path/csv]]
-
-‘-a’ is only if you use absolute path of –csv, if you don’t use absolute
-path, it will search in csv folder
+   $ cert create-multiple [--csv=[path/csv or csv name]]
 
 using config.ini:
 
 ::
 
-   $ cert -c create-multiple [-a] [--csv=[path/csv]]
+   $ cert -c create-multiple [--csv=[path/csv or csv name]]
 
 Please note, –csv override csv from config.ini
 
