@@ -5,6 +5,7 @@ import logging.handlers
 import click
 import platform
 import shutil
+import subprocess
 from codecs import open as c_open
 from config import Config
 from cert_exceptions import *
@@ -26,7 +27,7 @@ def edit_config(cert_folder, csv_file):
     if cert_folder:
         base_cert_directory = cert_folder
 
-    add_custom_folder(tools, base_cert_directory, "cert_directory")
+    add_custom_folder(Tools(), base_cert_directory, "cert_directory")
 
     if csv_file:
         base_csv_file = csv_file
@@ -236,6 +237,8 @@ class Tools:
                 self.error("Impossible to create app folder\n"
                            "Make sure you spell the path well: {p}".format(p=folder))
 
+        if not os.path.exists(self.csv_folder):
+            os.mkdir(self.csv_folder)
         click.echo(message)
 
     def add_custom_file(self, _file, option, ext="txt"):
@@ -295,6 +298,7 @@ class Tools:
         copy file
         :param source:
         :param destination:
+        :param message:
         :return:
         """
         if os.path.isfile(destination):
@@ -357,6 +361,24 @@ class Tools:
     def error(message):
         click.echo("\n========ERROR========\n{m}\n========ERROR========\n".format(m=message))
         raise click.Abort
+
+    @staticmethod
+    def shell(cmd, strip=True, silent=True):
+        """
+        write and return result of shell cmd
+        :param cmd:
+        :param strip:
+        :param silent:
+        :return:
+        """
+        if not silent:
+            click.echo('> {}' + cmd)
+        process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+        if process.wait() == 0:
+            if strip:
+                return process.communicate()[0].rstrip()
+            return process.communicate()[0]
+        return ''
 
 
 class Options(dict):
