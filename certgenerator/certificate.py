@@ -10,7 +10,7 @@ import shutil
 from glob import glob
 from OpenSSL import crypto
 from tools import Tools
-import exception
+from cert_exceptions import *
 
 
 class Certificate:
@@ -174,13 +174,14 @@ class Certificate:
             self.output("=========== {} generated ============".format(self.name), level=logging.DEBUG)
             click.echo("{n} generated in {p}\n".format(n=self.name, p=self.csr_folder))
 
-    def generate_multiple(self, csv_file=None, absolute=False):
+    def generate_multiple(self, csv_file=None):
         """
         Generate .csr for each serial
         :param csv_file:
-        :param absolute:
         :return:
         """
+
+        absolute = self.is_absolute(csv_file)
 
         _list = self.get_list_from_csv(csv_file=csv_file, absolute=absolute)
 
@@ -224,15 +225,17 @@ class Certificate:
             pass
         self.output(generated_msg, level=logging.DEBUG)
 
-    def generate_multiple_p12(self, pem_folder, key_folder=None, csv_file=None, absolute=False):
+    def generate_multiple_p12(self, pem_folder, key_folder=None, csv_file=None):
         """
         Generate multiple p12 file
         :param pem_folder:
         :param key_folder:
         :param csv_file:
-        :param absolute:
         :return:
         """
+
+        absolute = self.is_absolute(csv_file)
+
         _list = self.get_list_from_csv(csv_file=csv_file, absolute=absolute)
 
         certificate = self.csr_folder
@@ -617,7 +620,7 @@ class Certificate:
         csv_file = os.path.join(self.csv_folder, _file)
         if absolute:
             csv_file = _file
-        csv_dict = []
+        csv_list = []
         column = "serial"
         try:
             if self.check_extension(csv_file, "csv"):
@@ -625,8 +628,8 @@ class Certificate:
                 with open(csv_file) as f:
                     reader = csv.DictReader(f)
                     for row in reader:
-                        csv_dict.append(row[column])
-                return csv_dict
+                        csv_list.append(row[column])
+                return csv_list
         except IOError as err:
             self.output(err, level=logging.ERROR)
         except KeyError:
@@ -679,14 +682,23 @@ class Certificate:
         try:
             if expected_ext not in file_extension:
                 if trigger_error:
-                    raise exception.ExtensionException(_file)
+                    raise BadExtensionException(_file)
                 else:
                     pass
             else:
                 return True
-        except exception.ExtensionException, e:
+        except BadExtensionException, e:
             self.output("File with extension {e} is expected, \"{g}\" given"
                         .format(e=expected_ext, g=e), logging.ERROR)
+
+    @staticmethod
+    def is_absolute(path):
+        try:
+            if len(path.split("/")) == 1:
+                return False
+            return True
+        except AttributeError:
+            return False
 
     def shell(self, cmd, strip=True):
         """
