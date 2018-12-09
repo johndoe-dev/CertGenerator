@@ -1,5 +1,6 @@
 import os
 import ConfigParser
+import click
 try:
     from certgenerator.cert_exceptions import NoConfigException
 except ImportError:
@@ -17,6 +18,10 @@ class Config:
         self.config_parser = ConfigParser.RawConfigParser()
 
     def read_config_ini(self):
+        """
+        Read config.ini
+        :return:
+        """
         if os.path.exists(self.config_ini):
             self.config_parser.read(self.config_ini)
         else:
@@ -59,9 +64,9 @@ class Config:
         """
         try:
             return self.get_section(section)[key]
-        except TypeError as e:
+        except TypeError:
             return None
-        except KeyError as e:
+        except KeyError:
             return None
 
     def add(self, section, option, value):
@@ -78,8 +83,9 @@ class Config:
         except ConfigParser.DuplicateSectionError:
             pass
         self.config_parser.set(section, option, value)
-        with open(self.config_ini, "w") as f:
-            self.config_parser.write(f)
+        self.write_config_ini()
+        # with open(self.config_ini, "w") as f:
+        #     self.config_parser.write(f)
 
     def remove_section(self, section):
         """
@@ -89,8 +95,9 @@ class Config:
         """
         self.read_config_ini()
         self.config_parser.remove_section(section)
-        with open(self.config_ini, "w") as f:
-            self.config_parser.write(f)
+        self.write_config_ini()
+        # with open(self.config_ini, "w") as f:
+        #     self.config_parser.write(f)
 
     def remove_option(self, section, option):
         """
@@ -101,5 +108,18 @@ class Config:
         """
         self.read_config_ini()
         self.config_parser.remove_option(section, option)
-        with open(self.config_ini, "w") as f:
-            self.config_parser.write(f)
+        self.write_config_ini()
+        # with open(self.config_ini, "w") as f:
+        #     self.config_parser.write(f)
+
+    def write_config_ini(self):
+        """
+        Edit config ini
+        :return:
+        """
+        try:
+            with open(self.config_ini, "w") as f:
+                self.config_parser.write(f)
+        except IOError as e:
+            click.echo("{e}\nFailed to edit config.ini\nTry to use sudo cert".format(e=e))
+            raise click.Abort()
