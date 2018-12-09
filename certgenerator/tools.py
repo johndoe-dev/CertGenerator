@@ -27,7 +27,7 @@ def edit_config(cert_folder, csv_file):
     if cert_folder:
         base_cert_directory = cert_folder
 
-    add_custom_folder(Tools(), base_cert_directory, "cert_directory")
+    add_custom_folder(tools, base_cert_directory, "cert_directory")
 
     if csv_file:
         base_csv_file = csv_file
@@ -155,8 +155,7 @@ class Tools:
         :return:
         """
         self.load_config()
-        if not os.path.exists(self.app_folder):
-            os.mkdir(self.app_folder)
+        self.makedir(self.app_folder)
 
     def load_config(self):
         """
@@ -183,8 +182,7 @@ class Tools:
     def logger_folder(self):
         """create logger folder"""
         log = os.path.join(self.get_certificate_folder(), "log")
-        if not os.path.exists(log):
-            os.mkdir(log)
+        self.makedir(log)
         return log
 
     def get_logger(self):
@@ -232,15 +230,14 @@ class Tools:
                 raise NoFolderException("path: {p} is not a directory".format(p=folder))
         else:
             try:
-                os.mkdir(folder)
+                self.makedir(folder)
                 self.config.add(self.custom_section, option, folder)
                 self.load_config()
             except OSError:
                 self.error("Impossible to create app folder\n"
                            "Make sure you spell the path well: {p}".format(p=folder))
 
-        if not os.path.exists(self.csv_folder):
-            os.mkdir(self.csv_folder)
+        self.makedir(self.csv_folder)
         click.echo(message)
 
     def add_custom_file(self, _file, option, ext="txt"):
@@ -328,6 +325,12 @@ class Tools:
             with open(os.path.join(self.csv_folder, _file), 'w') as csv_file:
                 writer = csv.writer(csv_file)
                 writer.writerows(csv_data)
+
+    @staticmethod
+    def makedir(path):
+        if not os.path.exists(path):
+            os.mkdir(path)
+            os.chmod(path, 0777)
 
     @staticmethod
     def check_extension(_file, ext):
