@@ -1,3 +1,18 @@
+v2.1.5 (2018-12-08)
+-------------------
+
+- Update config
+	* catch IOError: Permission Denied when edit config.ini
+
+- Update certificate.py
+	* Upgrade code
+
+- Update tools.py
+	* Upgrade code
+	* change mode of app drectory to 0777 is cli is launch with sudo
+	* don't create app folder or csv file in failed to write in config.ini
+	* change mode of app drectory to 0777 is cli is launch with sudo
+
 v2.1.4 (2018-12-08)
 -------------------
 
