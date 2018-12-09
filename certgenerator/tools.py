@@ -37,6 +37,8 @@ def edit_config(cert_folder, csv_file):
             base_csv_file = tools.get_config("custom")["csv"]
         except KeyError:
             pass
+        except TypeError:
+            pass
 
     try:
         tools.add_custom_file(base_csv_file, "csvfile", ext="csv")
