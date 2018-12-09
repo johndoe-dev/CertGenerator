@@ -1,4 +1,3 @@
-import subprocess
 import csv
 import logging
 import logging.handlers
@@ -30,10 +29,10 @@ class Certificate:
         # Set directories path
         self.tools = Tools()
         self.tools.load_config()
-        self.basedir = Tools().here
-        self.Documents = Tools().documents
+        self.basedir = self.tools.here
+        self.Documents = self.tools.documents
         self.config_folder = self.get_folder(os.path.join(self.basedir, "config"))
-        self.app_folder = self.get_folder(Tools().app_folder)
+        self.app_folder = self.get_folder(self.tools.app_folder)
         self.certificate_folder = self.get_folder(os.path.join(self.app_folder, "certificate"))
         self.csv_folder = self.get_folder(os.path.join(self.app_folder, "csv"))
         self.csr_folder = self.get_folder(os.path.join(self.certificate_folder, "csr"))
@@ -714,5 +713,6 @@ class Certificate:
 
 
 if __name__ == "__main__":
-    my_cert = Certificate(Tools().get_logger())
+    tools = Tools()
+    my_cert = Certificate(tools.get_logger())
     print(my_cert.read_csv(_file="/Users/john/Desktop/cert/csv/bulk_enroll_devices.csv", absolute=True))
