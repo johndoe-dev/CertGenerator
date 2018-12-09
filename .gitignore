@@ -1,4 +1,4 @@
-cert_env/
+*_env/
 .idea/
 .DS_Store
 build/
