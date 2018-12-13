@@ -149,12 +149,21 @@ Create multiple p12
 ~~~~~~~~~~~~~~~~~~~
 
 * for creating multiple p12: pem file, key file and p12 must have the same name
-* Example if you create test.p12 test1.P12 ...:
-    in the csv file, you must have test test1 ...
+* Example if you create test1.p12 test2.P12 ...:
+    * In the csv file, you must have test1 test2 ...
+    * The pem files must be test1.pem test2.pem ...
+    * The key files must be test1.key test2.key ...
+    * It will search key files in folder/certificate/csr/
 
 ::
 
-    $ cert
+    $ cert create-multiple-p12 -c --pem-folder [path/of/pem folder]
+
+If you want to use an other folder to search key files, add --key-folder:
+
+::
+
+    $ cert create-multiple-p12 -c --pem-folder [path/of/pem folder] --key-folder [path/of/key folder]
 
 .. include:: CHANGES.txt
 
