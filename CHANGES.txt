@@ -23,6 +23,9 @@ ChangeLog
 		* Add function tools.add_config_file() to copy csr.yaml in folder app
 		* Edit function edit_config() => add parameter _yaml to edit yaml file
 
+	- Update setup.py
+		* add ruamel.yaml to install_requires
+
 	- Improve README
 
 - v2.1.5 (2018-12-08)
