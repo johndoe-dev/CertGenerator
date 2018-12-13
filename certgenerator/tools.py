@@ -1,4 +1,6 @@
 import os
+import ruamel.yaml
+import time
 import csv
 import logging
 import logging.handlers
@@ -11,13 +13,15 @@ from config import Config
 from cert_exceptions import *
 
 here = os.path.abspath(os.path.dirname(__file__))
+yaml = ruamel.yaml.YAML()
 
 
-def edit_config(cert_folder, csv_file):
+def edit_config(cert_folder, csv_file, _yaml):
     """
-    add or edit app folder or/and csv_file
+    add or edit app folder or/and csv_file or/and yaml
     :param cert_folder:
     :param csv_file:
+    :param _yaml:
     :return:
     """
     tools = Tools()
@@ -27,7 +31,12 @@ def edit_config(cert_folder, csv_file):
     if cert_folder:
         base_cert_directory = cert_folder
 
-    add_custom_folder(tools, base_cert_directory, "cert_directory")
+    try:
+        tools.add_custom_folder(base_cert_directory, "cert_directory")
+    except BadPathException as e:
+        tools.error(e)
+    except NoFolderException as e:
+        tools.error(e)
 
     if csv_file:
         base_csv_file = csv_file
@@ -41,27 +50,32 @@ def edit_config(cert_folder, csv_file):
             pass
 
     try:
-        tools.add_custom_file(base_csv_file, "csvfile", ext="csv")
+        tools.add_csv_file(base_csv_file, "csvfile", ext="csv")
     except NoFileException as e:
         tools.error(e)
     except BadExtensionException as e:
         tools.error(e)
 
+    if _yaml:
+        tools.write_yaml()
+    else:
+        try:
+            tools.add_config_file()
+        except NoFileException as e:
+            tools.error(e)
+        except BadExtensionException as e:
+            tools.error(e)
 
-def add_custom_folder(tools, folder, section):
-    """
-    create app folder
-    :param tools:
-    :param folder:
-    :param section:
-    :return:
-    """
-    try:
-        tools.add_custom_folder(folder, section)
-    except BadPathException as e:
-        tools.error(e)
-    except NoFolderException as e:
-        tools.error(e)
+
+def get_subject():
+    fields = ["C", "CN", "ST", "L", "O", "OU", "emailAddress", "san"]
+    subject = {}
+    for field in fields:
+        res = validate_subject(field)
+        if res == "-" or res == "":
+            continue
+        subject[field] = res
+    return subject
 
 
 def validate_subject(field):
@@ -110,6 +124,10 @@ def validate_subject(field):
         return str(click.prompt("Enter your email address (put \"-\" to fill empty)",
                                 default="{n}@localhost.fr".format(n=platform.node()), show_default=True))
 
+    elif field is "san":
+        return str(click.prompt("Enter Subject Alt name (san) separate by space (ex: test.com test2.com ...)"
+                                " (put \"-\" to fill empty)"))
+
 
 class Tools:
     def __init__(self):
@@ -117,14 +135,15 @@ class Tools:
         self.basedir = os.path.dirname(self.here)
         self.opts = Options()
         self.config = Config()
-        try:
-            self.config.read_config_ini()
-        except NoConfigException as e:
-            self.error("{e}\n".format(e=e))
+        # try:
+        #     self.config.read_config_ini()
+        # except NoConfigException as e:
+        #     self.error("{e}\n".format(e=e))
         self.about = self.get_app_info()
         self.documents = os.path.join(os.environ["HOME"], "Documents")
         self.app_folder = os.path.join(self.documents, self.get_app_info("__title__"))
         self.csv_folder = os.path.join(self.app_folder, "csv")
+        self.yaml_file = os.path.join(self.app_folder, self.config.yaml_file.split("/")[-1])
         self.custom_section = "custom"
         # Set cert folder
         self.load_config()
@@ -166,6 +185,7 @@ class Tools:
             if "cert_directory" in self.config.get_section(self.custom_section):
                 self.app_folder = self.config.get(self.custom_section, "cert_directory")
                 self.csv_folder = os.path.join(self.app_folder, "csv")
+                self.yaml_file = os.path.join(self.app_folder, self.config.yaml_file.split("/")[-1])
         except KeyError:
             pass
         except TypeError:
@@ -240,9 +260,9 @@ class Tools:
         self.makedir(self.csv_folder)
         click.echo(message)
 
-    def add_custom_file(self, _file, option, ext="txt"):
+    def add_csv_file(self, _file, option=None, ext="csv"):
         """
-        Add custom file in config ini
+        Add csv file in config ini and add file in path folder
         :param _file:
         :param option:
         :param ext:
@@ -256,24 +276,13 @@ class Tools:
             absolute = False
         self.load_config()
 
-        if _file == self.config.default_csv_file:
-            # Use default csv
-            try:
-                self.copy_file(_file, self.csv_folder,
-                               message="copy default csv : {s} to {d}"
-                               .format(s=_file.split("/")[-1], d=os.path.join(self.csv_folder, _file.split("/")[-1])))
-            except FileAlreadyExists as e:
-                click.echo("{e} => file selected".format(e=e))
-                self.config.remove_option("custom", "csv_file")
-            return
-
         if absolute:
             if os.path.exists(_file) and os.path.isfile(_file):
                 if self.check_extension(_file, ext):
                     source = _file
                     destination = self.csv_folder
                     message = "copy {s} to {d}"\
-                        .format(s=_file, d=os.path.join(self.csv_folder, _file.split('/')[-1]))
+                        .format(s=_file.split('/')[-1], d=os.path.join(self.csv_folder, _file.split('/')[-1]))
             else:
                 raise NoFileException("path: {p} doesn't exist".format(p=_file))
 
@@ -289,10 +298,25 @@ class Tools:
         except FileAlreadyExists as e:
             click.echo("{e} => file selected".format(e=e))
 
-        self.config.add(self.custom_section, option, _file.split("/")[-1])
+        if option:
+            self.config.add(self.custom_section, option, _file.split("/")[-1])
+
+    def add_config_file(self):
+        """
+        Add config file in path folder
+        :return:
+        """
+        try:
+            self.load_config()
+            source = self.config.yaml_file
+            destination = self.yaml_file
+            message = "add yaml: {f} in app directory: {p}".format(f=source.split('/')[-1], p=self.app_folder)
+            self.copy_file(self.config.yaml_file, destination, message=message)
+        except FileAlreadyExists as e:
+            click.echo("{e} => already added".format(e=e))
 
     @staticmethod
-    def copy_file(source, destination, message):
+    def copy_file(source, destination, message=None):
         """
         copy file
         :param source:
@@ -312,7 +336,8 @@ class Tools:
                 raise FileAlreadyExists("file {p} already exists"
                                     .format(p=os.path.join(destination, source.split("/")[-1])))
         shutil.copy2(source, destination)
-        click.echo(message)
+        if message:
+            click.echo(message)
 
     def create_csv_file(self, _file):
         """
@@ -328,17 +353,73 @@ class Tools:
 
     @staticmethod
     def makedir(path):
+        """
+        Create directory with all rights
+        :param path:
+        :return:
+        """
         if not os.path.exists(path):
             os.mkdir(path)
             os.chmod(path, 0777)
 
     @staticmethod
     def check_extension(_file, ext):
+        """
+        check extension of given file
+        :param _file:
+        :param ext:
+        :return:
+        """
         file_name, file_ext = os.path.splitext(_file)
         if ext in file_ext:
             return True
         raise BadExtensionException("file {f}: Extension {e} is expected, \"{g}\" given"
                                     .format(f=_file, e=ext, g=file_ext))
+
+    def write_yaml(self):
+        """
+        Write yaml in app folder
+        :return:
+        """
+        yaml_file = os.path.join(self.app_folder, self.config.yaml_file.split("/")[-1])
+        old_yaml = "{f}_{t}".format(f=yaml_file, t=time.strftime('%Y-%m-%d_%H-%M-%S', time.localtime(time.time())))
+        if self.app_folder_exists():
+            if os.path.exists(yaml_file):
+                click.echo("\nRename {f} to {n_f}".format(f=yaml_file.split("/")[-1], n_f=old_yaml.split("/")[-1]))
+                os.rename(yaml_file, old_yaml)
+            click.echo("configure csr.yaml\n")
+            subject = get_subject()
+            with open(yaml_file, "w") as f:
+                yaml.dump(subject, f)
+            click.echo("\ncsr.yaml has been configured")
+        else:
+            self.error("app folder: {p} doesn't exist\nTry \"cert init\" or \"cert config edit\" to create app folder"
+                       .format(p=self.app_folder))
+
+    def read_yaml(self):
+        """
+        Read yaml file from app folder
+        :return:
+        """
+        yaml_file = os.path.join(self.app_folder, self.config.yaml_file.split("/")[-1])
+        if self.app_folder_exists():
+            if not os.path.exists(yaml_file):
+                self.add_config_file()
+            with open(yaml_file) as f:
+                yaml_conf = yaml.load(f)
+            return yaml_conf
+        else:
+            self.error("app folder: {p} doesn't exist\nTry \"cert init\" or \"cert config edit\" to create app folder"
+                       .format(p=self.app_folder))
+
+    def app_folder_exists(self):
+        """
+        Check is app folder path exists
+        :return:
+        """
+        if os.path.exists(self.app_folder):
+            return True
+        return False
 
     def get_options(self):
         return self.opts
