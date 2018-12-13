@@ -13,9 +13,15 @@ class Config:
     def __init__(self):
         self.here = os.path.abspath(os.path.dirname(__file__))
         self.basedir = os.path.dirname(self.here)
-        self.default_csv_file = os.path.join(self.here, "serial.csv")
         self.config_ini = os.path.join(self.here, "config.ini")
         self.config_parser = ConfigParser.RawConfigParser()
+        try:
+            self.read_config_ini()
+        except NoConfigException as e:
+            click.echo("{e}\n".format(e=e))
+            raise click.Abort()
+        self.default_csv_file = os.path.join(self.here, self.get("config", "csvfile"))
+        self.yaml_file = os.path.join(self.here, self.get("config", "yamlfile"))
 
     def read_config_ini(self):
         """
@@ -33,6 +39,7 @@ class Config:
         :param section: if value is not none, return a directiory of all options of the specified setcion
         :return:
         """
+        # self.read_config_ini()
         if section:
             try:
                 items = self.config_parser.items(section)
@@ -77,15 +84,13 @@ class Config:
         :param value:
         :return:
         """
-        self.read_config_ini()
+        # self.read_config_ini()
         try:
             self.config_parser.add_section(section=section)
         except ConfigParser.DuplicateSectionError:
             pass
         self.config_parser.set(section, option, value)
         self.write_config_ini()
-        # with open(self.config_ini, "w") as f:
-        #     self.config_parser.write(f)
 
     def remove_section(self, section):
         """
@@ -96,8 +101,6 @@ class Config:
         self.read_config_ini()
         self.config_parser.remove_section(section)
         self.write_config_ini()
-        # with open(self.config_ini, "w") as f:
-        #     self.config_parser.write(f)
 
     def remove_option(self, section, option):
         """
@@ -109,8 +112,6 @@ class Config:
         self.read_config_ini()
         self.config_parser.remove_option(section, option)
         self.write_config_ini()
-        # with open(self.config_ini, "w") as f:
-        #     self.config_parser.write(f)
 
     def write_config_ini(self):
         """
