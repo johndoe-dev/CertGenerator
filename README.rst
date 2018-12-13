@@ -62,7 +62,7 @@ Configuration files
 
 .. csv-table:: serial.csv
    :header: "serial"
-   :widths: 10
+   :widths: 50
 
    "test1"
    "test2"
