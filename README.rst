@@ -5,8 +5,8 @@
 CertGenerator
 *************
 
-Python module to generate key, certificate request and self signed
-certificate
+Python module to generate key, certificate request, self signed
+certificate and p12 certificate
 
 Information
 -----------
@@ -41,7 +41,7 @@ Usage
     Options:
       -v, --verbose  Display only if necessary
       -d, --debug    Display all details
-      --version      show version and exit
+      -V, --version  show version and exit
       -h, --help     Show this message and exit.
 
     Commands:
@@ -50,169 +50,113 @@ Usage
       create-multiple      Create multiple certificate using csv file
       create-multiple-p12  Create multiple p12 using csv file
       create-p12           Create a simple p12 Need key file and pem file
-      init                 Create certificate folder and default csv file
+      init                 Create or edit certificate folder and csv file Add...
       read                 Read csr or p12
 
-On terminal you can use:
 
-::
-
-   $ cert [ARGS]
-
-The folder folder will be created in /Users/{user}/Documents/CertGenerator
-
-::
-
-    .CertGenerator
-    ├── certificate
-    │   ├── csr
-    │   └── p12
-    ├── csr.yaml
-    ├── csv
-    │   └── serial.csv
-    └── log
-        └── certgen.log
-
-You can change default app folder using init arg:
-
-::
-
-    $ cert init -cert {path}
-
-the new folder will be structured the same way
-
-Optional configurations file
-----------------------------
-
-**config.ini**
-~~~~~~~~~~~~~~
-
-
-2 sections in **config.ini**
-
-- **default**
-    - **log_file** is the log of file, where are referenced errors and warnings
-- **config**
-    -  **csvFile** is csv file to create several csr
-    -  **yamlFile** is the yaml file to configure the datas of the csr
-
-a third section **custom** can be added to change default app folder see config_.
-
-In **config.ini**:
-
-::
-
-    [default]
-    log_file = certgen.log
-
-    [config]
-    csvfile = serial.csv
-    yamlfile = csr.yaml
-
-.. _config:
-
-======================================
-Config add custom path to config ini
-======================================
-
-Read config ini
-
-::
-
-   $ cert config read
-
-Change default path of app and default csv file path or csv name, it will add a custom section
-
-::
-
-   $ cert config edit [-cert [path/to/app folder]] [-csv [path/to/csv or csv file]]
-
-Delete custom path of app or csv file, if no flag, it will delete the entire custom section
-
-::
-
-   $ cert config delete [[-cert] [-csv]]
-
-**yaml**
-~~~~~~~~
-
-::
-
-   CertGenerator
-   |── csr.yaml
-
-In **csr.yaml**:
-
-::
-
-   C: 'FR'
-   O: 'FTW Enterprise'
-   OU: 'IT'
-   CN: 'Test'
-   emailAddress: 'csr@test.com'
-
-**csv**
-~~~~~~~
-
-::
-
-   CertGenerator
-   ├── csv
-   │   └── serial.csv
-
--  You must add header column ‘serial’
--  you can create multiple csr using csv file in csv folder
--  The row from csv will be added in CN.
+PRE-CONFIGURATION
+-----------------
+Configuration files
+~~~~~~~~~~~~~~~~~~~
+**serial.csv**
 
 .. csv-table:: serial.csv
    :header: "serial"
    :widths: 10
 
-   "SN123456"
-   "SNjhgjkhkjh"
-   "SDjhijoklklk"
-   "SN654"
+   "test1"
+   "test2"
+   "test3"
 
-Create Certificate
-------------------
+**config.ini**
 
-Create one certificate
-~~~~~~~~~~~~~~~~~~~~~~
 
-::
-
-   $ cert create [FQDN]
-
-using config.ini:
+Create default folder
+    * Default folder => **$HOME/Documents/CertGenerator/**
+    * copy default csv file to **$HOME/Documents/CertGenerator/csv/serial.csv**
+    * copy yaml file to **$HOME/Documents/CertGenerator/csr.yaml**
 
 ::
 
-   $ cert create -c [FQDN]
+    $ cert init
 
-Create multiple certificate
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-using csv file:
+To change default folder or default csv:
 
 ::
 
-   $ cert create-multiple [--csv=[path/csv or csv name]]
+    $ cert init -cert [path/of/folder] -csv [path/of/csv/file]
 
-using config.ini:
-
-::
-
-   $ cert -c create-multiple [--csv=[path/csv or csv name]]
-
-Please note, –csv override csv from config.ini
-
-Read certificate
-~~~~~~~~~~~~~~~~
+or
 
 ::
 
-   $ cert read [path/of/csr]
+    $ cert config edit -cert [path/of/folder] -csv [path/of/csv/file]
 
+To edit yaml file:
+    * Enter the desired subject
+    * Enter "-" to keep empty
+    * If you want to create multiple csr using serial.csv, don't use Commmon Name => just enter "-" to keep empty
+    * **Note**: You always have old csr.yaml in folder under format csr.yam_[date od modification]
+
+::
+
+    $ cert config edit-yaml
+
+
+
+CONFIGURATION
+-------------
+
+Create csr
+----------
+
+Create one csr
+~~~~~~~~~~~~~~
+
+* Use -c if you want to use csr.yaml to create csr
+* The key and csr files will be created in {folder}/certificate/csr/
+* Example: With the command below it will create
+    * {folder}/certificate/csr/test/test.csr
+    * {folder}/certificate/csr/test/test.key
+
+::
+
+    $ cert create test -c
+
+Create multiple csr
+~~~~~~~~~~~~~~~~~~~
+
+* Use -c if you want to use csv file and csr.yaml
+
+::
+
+    * cert create-multiple -c
+
+
+Create p12
+----------
+
+Create one p12
+~~~~~~~~~~~~~~
+
+* You need pem file  and key file:
+
+::
+
+    $ cert create-p12 test.p12 --pem [path/of/pem file] --key [path/of/key file] -pass [password(default:3z6F2Xfc)]
+
+Create multiple p12
+~~~~~~~~~~~~~~~~~~~
+
+* for creating multiple p12: pem file, key file and p12 must have the same name
+* Example if you create test.p12 test1.P12 ...:
+    in the csv file, you must have test test1 ...
+
+::
+
+    $ cert
+
+.. include:: CHANGES.txt
 
 Links
 -----
