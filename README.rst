@@ -1,4 +1,5 @@
 .. _pip: https://pip.pypa.io/en/stable/quickstart/
+.. _changes: CHANGES.txt
 
 
 *************
@@ -167,6 +168,8 @@ If you want to use an other folder to search key files, add --key-folder:
 
 .. include:: ../CertGenerator/CHANGES.txt
     :encoding: 'utf-8'
+
+see changes_
 
 Links
 -----
