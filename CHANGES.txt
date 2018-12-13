@@ -1,94 +1,114 @@
-v2.1.5 (2018-12-08)
--------------------
+ChangeLog
+---------
 
-- Update config
-	* catch IOError: Permission Denied when edit config.ini
+- v2.1.6 (2018-12-13)
 
-- Update certificate.py
-	* Upgrade code
+	- Update confg
+		* Get yaml file => self.yaml_file = os.path.join(self.here, "csr.yaml")
 
-- Update tools.py
-	* Upgrade code
-	* change mode of app drectory to 0777 is cli is launch with sudo
-	* don't create app folder or csv file in failed to write in config.ini
-	* change mode of app drectory to 0777 is cli is launch with sudo
+	- Update certificate.py
+		* Change default import yaml
 
-v2.1.4 (2018-12-08)
--------------------
+	- Update cli.py
+		* Add -V to display version cert -V
+		* Edit command cert config read => display csr.yaml
+		* Add command cert config edit-yaml to edit csr.yaml
 
-- Update tools.py
-	* bug correction => catch TypeError
+	- Update decorators.py
+		* Update decorator folder_options() => add option (-y, --yaml) to edit yaml file
 
-v2.1.3 (2018-12-08)
--------------------
+	- Update tools.py
+		* Import and init yaml from package ruamel.yaml
+		* Add copy csr.yaml in edit_config_file()
+		* Add function tools.add_config_file() to copy csr.yaml in folder app
+		* Edit function edit_config() => add parameter _yaml to edit yaml file
 
-- Update callbacks.py
-	* Update display of version
+	- Improve README
 
-- Update certificate.py
-	* Simplify function shell
+- v2.1.5 (2018-12-08)
 
-- Update tools.py
-	* Add function shell
-	* bug correction
+	- Update config
+		* catch IOError: Permission Denied when edit config.ini
 
-v2.1.2 (2018-12-08)
--------------------
+	- Update certificate.py
+		* Upgrade code
 
-- Version Control
+	- Update tools.py
+		* Upgrade code
+		* change mode of app drectory to 0777 is cli is launch with sudo
+		* don't create app folder or csv file in failed to write in config.ini
+		* change mode of app drectory to 0777 is cli is launch with sudo
 
-- Update README.rst
+- v2.1.4 (2018-12-08)
 
-v2.1.1 (2018-12-08)
--------------------
+	- Update tools.py
+		* bug correction => catch TypeError
 
-- Version Control (__version__.py)
+- v2.1.3 (2018-12-08)
 
-- Update setup
-	* Update classifiers
-	* Add pyOpenSSL to install_requires
+	- Update callbacks.py
+		* Update display of version
 
-v2.1.0 (2018-12-08)
--------------------
+	- Update certificate.py
+		* Simplify function shell
 
-- Update config
-	* Add defult csv path to Config __init__()
-	* Rewrite import cert_exceptions => catch ImportError of NoConfigException
+	- Update tools.py
+		* Add function shell
+		* bug correction
 
-- Change import exception to import cert_exceptions
+- v2.1.2 (2018-12-08)
 
-- Change exception.py to cert_exceptions.py
-	* Change class name FolderException to class NoFolderException
-	* Change class name FileException to class NoFileException
-	* Change class nam PathException to class BadPathException
-	* Change class nam ExtensionException to class BadExtensionException
-	* Change class nam ConfigException to class NoConfigException
-	* Add class FileAlreadyExists
+	- Version Control
 
-- Update certificate.py
-	* add function is_absolute to check if path is absolute
-	* update functions generate_multiple and generate_multiple_p12 => remove absolute parameter
+	- Update README.rst
 
-- Update cli.py
-	* update args generate-multiple and generate-multiple-p12 => remove absolute option
+- v2.1.1 (2018-12-08)
 
-- Update decorators.py
-	* update csv_options decorators => remove absolute option
+	- Version Control (__version__.py)
 
-- Update tools.py
-	* Simplify function edit_config
-	* Add function add_custom_folder
-	* Update class Tools
-		* Add function copy_file, create_csv_file (not used)
-		* Update functions add_custom_folder and add_custom_file
+	- Update setup
+		* Update classifiers
+		* Add pyOpenSSL to install_requires
 
-- Update documentation README.rst
+- v2.1.0 (2018-12-08)
 
-- Update setup
-	* Add classifiers
-		* 'Programming Language :: Python :: 2.7'
+	- Update config
+		* Add defult csv path to Config __init__()
+		* Rewrite import cert_exceptions => catch ImportError of NoConfigException
 
-v2.0.0 (2018-12-06)
--------------------
+	- Change import exception to import cert_exceptions
 
- - Initial release.
+	- Change exception.py to cert_exceptions.py
+		* Change class name FolderException to class NoFolderException
+		* Change class name FileException to class NoFileException
+		* Change class nam PathException to class BadPathException
+		* Change class nam ExtensionException to class BadExtensionException
+		* Change class nam ConfigException to class NoConfigException
+		* Add class FileAlreadyExists
+
+	- Update certificate.py
+		* add function is_absolute to check if path is absolute
+		* update functions generate_multiple and generate_multiple_p12 => remove absolute parameter
+
+	- Update cli.py
+		* update args generate-multiple and generate-multiple-p12 => remove absolute option
+
+	- Update decorators.py
+		* update csv_options decorators => remove absolute option
+
+	- Update tools.py
+		* Simplify function edit_config
+		* Add function add_custom_folder
+		* Update class Tools
+			* Add function copy_file, create_csv_file (not used)
+			* Update functions add_custom_folder and add_custom_file
+
+	- Update documentation README.rst
+
+	- Update setup
+		* Add classifiers
+			* 'Programming Language :: Python :: 2.7'
+
+- v2.0.0 (2018-12-06)
+
+	- Initial release.
