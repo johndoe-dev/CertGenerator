@@ -165,7 +165,8 @@ If you want to use an other folder to search key files, add --key-folder:
 
     $ cert create-multiple-p12 -c --pem-folder [path/of/pem folder] --key-folder [path/of/key folder]
 
-.. include:: CHANGES.txt
+.. include:: ../CertGenerator/CHANGES.txt
+    :literal:
 
 Links
 -----
