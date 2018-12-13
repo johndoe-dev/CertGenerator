@@ -40,6 +40,9 @@ def folder_options(f):
                      type=str,
                      help="Define path to save generated csr and p12, default is {p}"
                      .format(p=os.path.join(Tools().app_folder, "certificate"))),
+        click.option("-y", "--yaml",
+                     is_flag=True,
+                     help="Copy and edit Yaml file in generated path")
     ]
     return functools.reduce(lambda x, opt: opt(x), options, f)
 
