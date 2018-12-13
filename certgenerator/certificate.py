@@ -2,13 +2,12 @@ import csv
 import logging
 import logging.handlers
 import os
-import yaml
 import json
 import click
 import shutil
 from glob import glob
 from OpenSSL import crypto
-from tools import Tools
+from tools import Tools, yaml
 from cert_exceptions import *
 
 
