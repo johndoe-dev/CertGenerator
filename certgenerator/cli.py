@@ -11,7 +11,7 @@ tools = Tools()
 @click.group(context_settings=dict(help_option_names=['-h', '--help']))
 @click.option('-v', '--verbose', is_flag=True, help="Display only if necessary")
 @click.option('-d', '--debug', is_flag=True, help="Display all details")
-@click.option('--version', is_flag=True, callback=callbacks.print_version,
+@click.option('-V', '--version', is_flag=True, callback=callbacks.print_version,
               expose_value=False, is_eager=True, help="show version and exit")
 def main(verbose, debug):
     """
@@ -26,11 +26,12 @@ def main(verbose, debug):
 @main.command()
 @decorators.folder_options
 @decorators.csv_options
-def init(cert_folder, csv_file):
+def init(cert_folder, csv_file, yaml):
     """
-    Create certificate folder and default csv file
+    Create or edit certificate folder and csv file
+    Add yaml file if not exists (csr.yaml)
     """
-    edit_config(cert_folder, csv_file)
+    edit_config(cert_folder, csv_file, yaml)
 
 
 @main.command()
@@ -153,18 +154,31 @@ def read():
     """
     read config ini
     """
-    _config = tools.get_config()
-    click.echo(json.dumps(_config.get_all(), indent=2))
+    if tools.app_folder_exists():
+        list_yaml = json.dumps(tools.read_yaml(), indent=2)
+    else:
+        list_yaml = "Create app folder using \"cert init\" or \"cert config edit\" before read or edit yaml file"
+    click.echo("+++++config.ini+++++\n{c}".format(c=json.dumps(tools.config.get_all(), indent=2)))
+    click.echo("\n\n+++++csr.yaml+++++\n{y}".format(y=list_yaml))
 
 
 @config.command()
 @decorators.folder_options
 @decorators.csv_options
-def edit(cert_folder, csv_file):
+def edit(cert_folder, csv_file, yaml):
     """
-    Add option in config ini (csr, p12 and csv path)
+    Create or edit certificate folder and csv file
+    Add yaml file if not exists (csr.yaml)
     """
-    edit_config(cert_folder, csv_file)
+    edit_config(cert_folder, csv_file, yaml)
+
+
+@config.command()
+def edit_yaml():
+    """
+    Edit Yaml file
+    """
+    tools.write_yaml()
 
 
 @config.command()
