@@ -47,7 +47,7 @@ setup(
     description=about('__description__'),
     long_description=long_description(),
     py_modules='cert',
-    install_requires=['click', 'PyYAML', 'pyOpenSSL'],
+    install_requires=['click', 'PyYAML', 'pyOpenSSL', 'ruamel.yaml'],
     packages=find_packages(),
     include_package_data=True,
     package_data={
