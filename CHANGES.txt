@@ -1,117 +1,127 @@
-ChangeLog
----------
+v2.1.7 (2018-12-13)
+-------------------
 
-- v2.1.6 (2018-12-13)
+-Improve README
 
-	- Update confg
-		* Get yaml file => self.yaml_file = os.path.join(self.here, "csr.yaml")
+v2.1.6 (2018-12-13)
+-------------------
 
-	- Update certificate.py
-		* Change default import yaml
+- Update confg
+	* Get yaml file => self.yaml_file = os.path.join(self.here, "csr.yaml")
 
-	- Update cli.py
-		* Add -V to display version cert -V
-		* Edit command cert config read => display csr.yaml
-		* Add command cert config edit-yaml to edit csr.yaml
+- Update certificate.py
+	* Change default import yaml
 
-	- Update decorators.py
-		* Update decorator folder_options() => add option (-y, --yaml) to edit yaml file
+- Update cli.py
+	* Add -V to display version cert -V
+	* Edit command cert config read => display csr.yaml
+	* Add command cert config edit-yaml to edit csr.yaml
 
-	- Update tools.py
-		* Import and init yaml from package ruamel.yaml
-		* Add copy csr.yaml in edit_config_file()
-		* Add function tools.add_config_file() to copy csr.yaml in folder app
-		* Edit function edit_config() => add parameter _yaml to edit yaml file
+- Update decorators.py
+	* Update decorator folder_options() => add option (-y, --yaml) to edit yaml file
 
-	- Update setup.py
-		* add ruamel.yaml to install_requires
+- Update tools.py
+	* Import and init yaml from package ruamel.yaml
+	* Add copy csr.yaml in edit_config_file()
+	* Add function tools.add_config_file() to copy csr.yaml in folder app
+	* Edit function edit_config() => add parameter _yaml to edit yaml file
 
-	- Improve README
+- Update setup.py
+	* add ruamel.yaml to install_requires
 
-- v2.1.5 (2018-12-08)
+- Improve README
 
-	- Update config
-		* catch IOError: Permission Denied when edit config.ini
+v2.1.5 (2018-12-08)
+-------------------
 
-	- Update certificate.py
-		* Upgrade code
+- Update config
+	* catch IOError: Permission Denied when edit config.ini
 
-	- Update tools.py
-		* Upgrade code
-		* change mode of app drectory to 0777 is cli is launch with sudo
-		* don't create app folder or csv file in failed to write in config.ini
-		* change mode of app drectory to 0777 is cli is launch with sudo
+- Update certificate.py
+	* Upgrade code
 
-- v2.1.4 (2018-12-08)
+- Update tools.py
+	* Upgrade code
+	* change mode of app drectory to 0777 is cli is launch with sudo
+	* don't create app folder or csv file in failed to write in config.ini
+	* change mode of app drectory to 0777 is cli is launch with sudo
 
-	- Update tools.py
-		* bug correction => catch TypeError
+v2.1.4 (2018-12-08)
+-------------------
 
-- v2.1.3 (2018-12-08)
+- Update tools.py
+	* bug correction => catch TypeError
 
-	- Update callbacks.py
-		* Update display of version
+v2.1.3 (2018-12-08)
+-------------------
 
-	- Update certificate.py
-		* Simplify function shell
+- Update callbacks.py
+	* Update display of version
 
-	- Update tools.py
-		* Add function shell
-		* bug correction
+- Update certificate.py
+	* Simplify function shell
 
-- v2.1.2 (2018-12-08)
+- Update tools.py
+	* Add function shell
+	* bug correction
 
-	- Version Control
+v2.1.2 (2018-12-08)
+-------------------
 
-	- Update README.rst
+- Version Control
 
-- v2.1.1 (2018-12-08)
+- Update README.rst
 
-	- Version Control (__version__.py)
+v2.1.1 (2018-12-08)
+-------------------
 
-	- Update setup
-		* Update classifiers
-		* Add pyOpenSSL to install_requires
+- Version Control (__version__.py)
 
-- v2.1.0 (2018-12-08)
+- Update setup
+	* Update classifiers
+	* Add pyOpenSSL to install_requires
 
-	- Update config
-		* Add defult csv path to Config __init__()
-		* Rewrite import cert_exceptions => catch ImportError of NoConfigException
+v2.1.0 (2018-12-08)
+-------------------
 
-	- Change import exception to import cert_exceptions
+- Update config
+	* Add defult csv path to Config __init__()
+	* Rewrite import cert_exceptions => catch ImportError of NoConfigException
 
-	- Change exception.py to cert_exceptions.py
-		* Change class name FolderException to class NoFolderException
-		* Change class name FileException to class NoFileException
-		* Change class nam PathException to class BadPathException
-		* Change class nam ExtensionException to class BadExtensionException
-		* Change class nam ConfigException to class NoConfigException
-		* Add class FileAlreadyExists
+- Change import exception to import cert_exceptions
 
-	- Update certificate.py
-		* add function is_absolute to check if path is absolute
-		* update functions generate_multiple and generate_multiple_p12 => remove absolute parameter
+- Change exception.py to cert_exceptions.py
+	* Change class name FolderException to class NoFolderException
+	* Change class name FileException to class NoFileException
+	* Change class nam PathException to class BadPathException
+	* Change class nam ExtensionException to class BadExtensionException
+	* Change class nam ConfigException to class NoConfigException
+	* Add class FileAlreadyExists
 
-	- Update cli.py
-		* update args generate-multiple and generate-multiple-p12 => remove absolute option
+- Update certificate.py
+	* add function is_absolute to check if path is absolute
+	* update functions generate_multiple and generate_multiple_p12 => remove absolute parameter
 
-	- Update decorators.py
-		* update csv_options decorators => remove absolute option
+- Update cli.py
+	* update args generate-multiple and generate-multiple-p12 => remove absolute option
 
-	- Update tools.py
-		* Simplify function edit_config
-		* Add function add_custom_folder
-		* Update class Tools
-			* Add function copy_file, create_csv_file (not used)
-			* Update functions add_custom_folder and add_custom_file
+- Update decorators.py
+	* update csv_options decorators => remove absolute option
 
-	- Update documentation README.rst
+- Update tools.py
+	* Simplify function edit_config
+	* Add function add_custom_folder
+	* Update class Tools
+		* Add function copy_file, create_csv_file (not used)
+		* Update functions add_custom_folder and add_custom_file
 
-	- Update setup
-		* Add classifiers
-			* 'Programming Language :: Python :: 2.7'
+- Update documentation README.rst
 
-- v2.0.0 (2018-12-06)
+- Update setup
+	* Add classifiers
+		* 'Programming Language :: Python :: 2.7'
 
-	- Initial release.
+v2.0.0 (2018-12-06)
+-------------------
+
+- Initial release.
