@@ -85,7 +85,7 @@ def validate_subject(field):
     :return:
     """
     if field is "C":
-        c = str(click.prompt("Enter your Country Name (2 letter code) (put \"-\" to fill empty)",
+        c = str(click.prompt("Enter your Country Name (2 letter code) (put \"-\" to keep empty)",
                              default="US", show_default=True))
         if c == "-":
             return c
@@ -100,33 +100,33 @@ def validate_subject(field):
 
     elif field is "CN":
         return str(
-            click.prompt("Enter your Common Name (eg, DNS name) (put \"-\" to fill empty)",
+            click.prompt("Enter your Common Name (eg, DNS name) (put \"-\" to keep empty)",
                          default=platform.node(), show_default=True))
 
     elif field is "ST":
-        return str(click.prompt("Enter your State or Province <full name> (put \"-\" to fill empty)",
+        return str(click.prompt("Enter your State or Province <full name> (put \"-\" to keep empty)",
                                 default="France", show_default=True))
 
     elif field is "L":
-        return str(click.prompt("Enter your (Locality Name (eg, city) (put \"-\" to fill empty)",
+        return str(click.prompt("Enter your (Locality Name (eg, city) (put \"-\" to keep empty)",
                                 default="Paris", show_default=True))
 
     elif field is "O":
         return str(
-            click.prompt("Enter your Organization Name (eg, company) (put \"-\" to fill empty)",
+            click.prompt("Enter your Organization Name (eg, company) (put \"-\" to keep empty)",
                          default="Enterprise", show_default=True))
 
     elif field is "OU":
-        return str(click.prompt("Enter your Organizational Unit (eg, section) (put \"-\" to fill empty)",
+        return str(click.prompt("Enter your Organizational Unit (eg, section) (put \"-\" to keep empty)",
                                 default="IT", show_default=True))
 
     elif field is "emailAddress":
-        return str(click.prompt("Enter your email address (put \"-\" to fill empty)",
+        return str(click.prompt("Enter your email address (put \"-\" to keep empty)",
                                 default="{n}@localhost.fr".format(n=platform.node()), show_default=True))
 
     elif field is "san":
         return str(click.prompt("Enter Subject Alt name (san) separate by space (ex: test.com test2.com ...)"
-                                " (put \"-\" to fill empty)"))
+                                " (put \"-\" to keep empty)"))
 
 
 class Tools:
@@ -135,10 +135,6 @@ class Tools:
         self.basedir = os.path.dirname(self.here)
         self.opts = Options()
         self.config = Config()
-        # try:
-        #     self.config.read_config_ini()
-        # except NoConfigException as e:
-        #     self.error("{e}\n".format(e=e))
         self.about = self.get_app_info()
         self.documents = os.path.join(os.environ["HOME"], "Documents")
         self.app_folder = os.path.join(self.documents, self.get_app_info("__title__"))
