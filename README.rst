@@ -115,6 +115,7 @@ Create one csr
 ~~~~~~~~~~~~~~
 
 * Use -c if you want to use csr.yaml to create csr
+* Use -f to overwrite existing csr
 * The key and csr files will be created in {folder}/certificate/csr/
 * Example: With the command below it will create
     * {folder}/certificate/csr/test/test.csr
@@ -122,16 +123,17 @@ Create one csr
 
 ::
 
-    $ cert create test -c
+    $ cert create test -c [-f]
 
 Create multiple csr
 ~~~~~~~~~~~~~~~~~~~
 
 * Use -c if you want to use csv file and csr.yaml
+* Use -f to overwrite existing csr
 
 ::
 
-    * cert create-multiple -c
+    * cert create-multiple -c [-f]
 
 
 Create p12
@@ -141,15 +143,17 @@ Create one p12
 ~~~~~~~~~~~~~~
 
 * You need pem file  and key file:
+* Use -f to overwrite existing p12
 
 ::
 
-    $ cert create-p12 test.p12 --pem [path/of/pem file] --key [path/of/key file] -pass [password(default:3z6F2Xfc)]
+    $ cert create-p12 test.p12 [-f] --pem [path/of/pem file] --key [path/of/key file] -pass [password(default:3z6F2Xfc)]
 
 Create multiple p12
 ~~~~~~~~~~~~~~~~~~~
 
 * for creating multiple p12: pem file, key file and p12 must have the same name
+* Use -f to overwrite existing p12
 * Example if you create test1.p12 test2.P12 ...:
     * In the csv file, you must have test1 test2 ...
     * The pem files must be test1.pem test2.pem ...
@@ -158,13 +162,13 @@ Create multiple p12
 
 ::
 
-    $ cert create-multiple-p12 -c --pem-folder [path/of/pem folder]
+    $ cert create-multiple-p12 -c [-f] --pem-folder [path/of/pem folder]
 
 If you want to use an other folder to search key files, add --key-folder:
 
 ::
 
-    $ cert create-multiple-p12 -c --pem-folder [path/of/pem folder] --key-folder [path/of/key folder]
+    $ cert create-multiple-p12 -c [-f] --pem-folder [path/of/pem folder] --key-folder [path/of/key folder]
 
 ChangeLog
 ---------
