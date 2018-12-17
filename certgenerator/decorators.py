@@ -14,6 +14,7 @@ def global_options(argument="csr"):
         options = [
             click.option('-c', '--config', is_flag=True,
                          help="Use config.ini, if you use csv, column 'serial' required"),
+            click.option('-f', '--force', is_flag=True, help="Overwrite existing file"),
             click.option('-ks', '--key-size', type=click.Choice(['1024', '2048', '4096']),
                          help="Define key size", show_choices=True),
             click.option('-sa', '--san', multiple=True, type=str),
@@ -27,6 +28,7 @@ def global_options(argument="csr"):
                 options = [
                     click.option('-c', '--config', is_flag=True,
                                  help="Use config.ini, if you use csv, column 'serial' required"),
+                    click.option('-f', '--force', is_flag=True, help="Overwrite existing file"),
                 ]
         return functools.reduce(lambda x, opt: opt(x), options, f)
     return inner_options
