@@ -39,7 +39,7 @@ def init(cert_folder, csv_file, yaml):
 @decorators.pass_logger
 @click.argument('name', type=str, required=False)
 @decorators.global_options("csr")
-def create(logger, ctx, name, config, key_size, san, **subject):
+def create(logger, ctx, name, config, force, key_size, san, **subject):
     """
     Create a single CSR
     """
@@ -53,7 +53,7 @@ def create(logger, ctx, name, config, key_size, san, **subject):
     if 'subject' in tools.opts:
         cert.load_subject()
 
-    cert.generate_csr()
+    cert.generate_csr(force=force)
 
 
 @main.command()
@@ -61,7 +61,7 @@ def create(logger, ctx, name, config, key_size, san, **subject):
 @decorators.pass_logger
 @decorators.csv_options
 @decorators.global_options("csr")
-def create_multiple(logger, ctx, csv_file, config, key_size, san, **subject):
+def create_multiple(logger, ctx, csv_file, config, force, key_size, san, **subject):
     """
     Create multiple certificate using csv file
     """
@@ -72,9 +72,9 @@ def create_multiple(logger, ctx, csv_file, config, key_size, san, **subject):
         cert.load_subject()
 
     if csv_file:
-        cert.generate_multiple(csv_file=csv_file)
+        cert.generate_multiple(csv_file=csv_file, force=force)
     else:
-        cert.generate_multiple()
+        cert.generate_multiple(force=force)
 
 
 @main.command()
@@ -85,7 +85,7 @@ def create_multiple(logger, ctx, csv_file, config, key_size, san, **subject):
 @click.option('-k', '--key', type=str)
 @click.option('-pass', '--password', type=str, hide_input=True, help="Define password, default is '3z6F2Xfc'")
 @decorators.global_options("p12")
-def create_p12(logger, ctx, name, pem, key, password, config):
+def create_p12(logger, ctx, name, pem, key, password, config, force):
     """
     Create a simple p12
     Need key file and pem file
@@ -94,9 +94,9 @@ def create_p12(logger, ctx, name, pem, key, password, config):
 
     cert = Certificate(logger=logger, opts=tools.opts)
     if password:
-        cert.generate_p12(key=key, pem=pem, p12=name, password=password)
+        cert.generate_p12(key=key, pem=pem, p12=name, password=password, force=force)
     else:
-        cert.generate_p12(key=key, pem=pem, p12=name)
+        cert.generate_p12(key=key, pem=pem, p12=name, force=force)
 
 
 @main.command()
@@ -108,7 +108,7 @@ def create_p12(logger, ctx, name, pem, key, password, config):
               help="Define key folder where all the key are located,"
                    " if not defined, it will search key in certificate folder")
 @decorators.global_options("p12")
-def create_multiple_p12(logger, ctx, csv_file, pem_folder, key_folder, config):
+def create_multiple_p12(logger, ctx, csv_file, pem_folder, key_folder, config, force):
     """
     Create multiple p12 using csv file
     """
@@ -116,9 +116,9 @@ def create_multiple_p12(logger, ctx, csv_file, pem_folder, key_folder, config):
 
     cert = Certificate(logger, opts=tools.opts)
     if csv_file:
-        cert.generate_multiple_p12(csv_file=csv_file, pem_folder=pem_folder, key_folder=key_folder)
+        cert.generate_multiple_p12(csv_file=csv_file, pem_folder=pem_folder, key_folder=key_folder, force=force)
     else:
-        cert.generate_multiple_p12(pem_folder=pem_folder, key_folder=key_folder)
+        cert.generate_multiple_p12(pem_folder=pem_folder, key_folder=key_folder, force=force)
 
 
 @main.command()
