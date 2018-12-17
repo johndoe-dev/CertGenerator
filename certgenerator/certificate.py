@@ -137,9 +137,10 @@ class Certificate:
 
         return key
 
-    def generate_csr(self):
+    def generate_csr(self, force=False):
         """
         Generate csr file
+        :param force
         :return:
         """
         self.get_csr_name()
@@ -166,18 +167,16 @@ class Certificate:
         req.sign(key, "sha256")
 
         self.output("=========== generate {} ============".format(self.name), level=logging.DEBUG)
-        if self.exists(self.csr_file) and self.exists(self.key_file):
-            self.output("{} already exists => abort".format(self.name))
+        if force:
+            self.overwrite_csr(req=req, key=key)
         else:
-            self.generate_file(self.key_file, key)
-            self.generate_file(self.csr_file, req)
-            self.output("=========== {} generated ============".format(self.name), level=logging.DEBUG)
-            click.echo("{n} generated in {p}\n".format(n=self.name, p=self.csr_folder))
+            self.write_csr(req=req, key=key)
 
-    def generate_multiple(self, csv_file=None):
+    def generate_multiple(self, csv_file=None, force=False):
         """
         Generate .csr for each serial
         :param csv_file:
+        :param force
         :return:
         """
 
@@ -188,49 +187,44 @@ class Certificate:
         for name in _list:
             self.create_request(name=name)
             self.set_subject(CN=name)
-            self.generate_csr()
+            self.generate_csr(force=force)
 
-    def generate_p12(self, key=None, pem=None, p12=None, password="3z6F2Xfc"):
+    def generate_p12(self, key=None, pem=None, p12=None, password="3z6F2Xfc", force=False):
         """
         Generate p12 file
         :param key:
         :param pem:
         :param p12:
         :param password:
+        :param force:
         :return:
         """
         self.output("=========== generate {} ============".format(p12), level=logging.DEBUG)
-        generated_msg = "=========== {} generated ============".format(p12)
+        generated = True
         if self.check_extension(p12, "p12"):
             if not self.exists(self.p12_folder):
                 self.output("Create p12 folder", level=logging.DEBUG)
                 os.mkdir(self.p12_folder)
-            if self.exists(os.path.join(self.p12_folder, p12), trigger_warning=False):
-                self.output("{f} already exists, abort".format(f=p12))
-                generated_msg = "=========== {} not generated ============".format(p12)
-                pass
+            if force:
+                generated = self.overwrite_p12(p12=p12, key=key, pem=pem, password=password)
             else:
-                if self.exists(key, trigger_error=True) and self.exists(pem, trigger_error=True):
-                    if self.check_extension(key, "key") and self.check_extension(pem, "pem"):
-                        cmd = "openssl pkcs12 -inkey {key} -in {pem} -export -out {p12} -password pass:{p}"\
-                            .format(key=key, pem=pem, p12=p12, p=password)
-                        self.shell(cmd)
-                        if self.exists(p12) and self.check_p12(path=p12, password=password, read=False):
-                            self.output("move {p} to {f}".format(p=p12, f=self.p12_folder), level=logging.DEBUG)
-                            os.rename(p12, os.path.join(self.p12_folder, p12))
-                            click.echo("{n} generated in {p}\n".format(n=p12, p=self.p12_folder))
+                generated = self.write_p12(p12=p12, key=key, pem=pem, password=password)
         try:
             os.remove(p12)
         except OSError:
             pass
-        self.output(generated_msg, level=logging.DEBUG)
+        if generated:
+            self.output("=========== {} generated ============".format(p12), level=logging.DEBUG)
+        else:
+            self.output("=========== {} not generated ============".format(p12), level=logging.DEBUG)
 
-    def generate_multiple_p12(self, pem_folder, key_folder=None, csv_file=None):
+    def generate_multiple_p12(self, pem_folder, key_folder=None, csv_file=None, force=False):
         """
         Generate multiple p12 file
         :param pem_folder:
         :param key_folder:
         :param csv_file:
+        :param force:
         :return:
         """
 
@@ -256,7 +250,7 @@ class Certificate:
                 pem = os.path.join(pem_folder, name + ".pem")
                 p12 = name + ".p12"
                 if self.exists(key) and self.exists(pem):
-                    self.generate_p12(key=key, pem=pem, p12=p12)
+                    self.generate_p12(key=key, pem=pem, p12=p12, force=force)
 
     def get_csr_name(self):
         """
@@ -405,6 +399,75 @@ class Certificate:
                 return self.subject.get(key)
             return None
         return self.subject
+
+    def overwrite_p12(self, p12, key, pem, password):
+        """
+        :param p12:
+        :param key:
+        :param pem:
+        :param password:
+        :return:
+        """
+        if self.exists(key, trigger_error=True) and self.exists(pem, trigger_error=True):
+            if self.check_extension(key, "key") and self.check_extension(pem, "pem"):
+                cmd = "openssl pkcs12 -inkey {key} -in {pem} -export -out {p12} -password pass:{p}" \
+                    .format(key=key, pem=pem, p12=p12, p=password)
+                self.shell(cmd)
+                if self.exists(p12) and self.check_p12(path=p12, password=password, read=False):
+                    self.output("move {p} to {f}".format(p=p12, f=self.p12_folder), level=logging.DEBUG)
+                    os.rename(p12, os.path.join(self.p12_folder, p12))
+                    click.echo("{n} generated in {p}\n".format(n=p12, p=self.p12_folder))
+        return True
+
+    def write_p12(self, p12, key, pem, password):
+        """
+        :param p12:
+        :param key:
+        :param pem:
+        :param password:
+        :return:
+        """
+        if self.exists(os.path.join(self.p12_folder, p12), trigger_warning=False):
+            self.output("{f} already exists, abort".format(f=p12))
+            return False
+        else:
+            if self.exists(key, trigger_error=True) and self.exists(pem, trigger_error=True):
+                if self.check_extension(key, "key") and self.check_extension(pem, "pem"):
+                    cmd = "openssl pkcs12 -inkey {key} -in {pem} -export -out {p12} -password pass:{p}" \
+                        .format(key=key, pem=pem, p12=p12, p=password)
+                    self.shell(cmd)
+                    if self.exists(p12) and self.check_p12(path=p12, password=password, read=False):
+                        self.output("move {p} to {f}".format(p=p12, f=self.p12_folder), level=logging.DEBUG)
+                        os.rename(p12, os.path.join(self.p12_folder, p12))
+                        click.echo("{n} generated in {p}\n".format(n=p12, p=self.p12_folder))
+        return True
+
+    def overwrite_csr(self, req, key):
+        """
+        Overwrite csr file
+        :param req:
+        :param key:
+        :return:
+        """
+        self.generate_file(self.key_file, key)
+        self.generate_file(self.csr_file, req)
+        self.output("=========== {} generated ============".format(self.name), level=logging.DEBUG)
+        click.echo("{n} generated in {p}\n".format(n=self.name, p=self.csr_folder))
+
+    def write_csr(self, req, key):
+        """
+        Write csr file
+        :param req:
+        :param key:
+        :return:
+        """
+        if self.exists(self.csr_file) and self.exists(self.key_file):
+            self.output("{} already exists => abort".format(self.name))
+        else:
+            self.generate_file(self.key_file, key)
+            self.generate_file(self.csr_file, req)
+            self.output("=========== {} generated ============".format(self.name), level=logging.DEBUG)
+            click.echo("{n} generated in {p}\n".format(n=self.name, p=self.csr_folder))
 
     def generate_file(self, mk_file, request):
         """
