@@ -1,5 +1,5 @@
 .. _pip: https://pip.pypa.io/en/stable/quickstart/
-.. _changes: CHANGES.txt
+.. _changes: https://github.com/johndoe-dev/CertGenerator/blob/master/CHANGES.txt
 
 
 *************
