@@ -1,12 +1,26 @@
+v2.1.9 (2018-12-17)
+-------------------
+
+Add options f to force to overwrite existing csr or p12
+
+- Update certificate.py
+	* Add param 'force' to functions: generate_csr(), generate_multiple(), generate_p12(), generate_mumtiple_p12()
+	* Add functions: overwrite_csr(), write_csr(), overwrite_p12(), write_p12()
+- Update cli.py
+	* Add param 'force' to functions: create(), create_multiple(), create_p12(), create_mumtiple_p12()
+- Update decorators.py
+	* Add option --force to decorator global_options()
+- Improve README
+
 v2.1.8 (2018-12-17)
 -------------------
 
--Improve README
+- Improve README
 
 v2.1.7 (2018-12-13)
 -------------------
 
--Improve README
+- Improve README
 
 v2.1.6 (2018-12-13)
 -------------------
