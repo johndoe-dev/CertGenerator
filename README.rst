@@ -36,7 +36,7 @@ Usage
 
 ::
 
-    Usage: cli.py [OPTIONS] COMMAND [ARGS]...
+    Usage: cert [OPTIONS] COMMAND [ARGS]...
 
       A command line tool to create and read CSR and P12
 
