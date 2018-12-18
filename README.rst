@@ -41,8 +41,6 @@ Usage
       A command line tool to create and read CSR and P12
 
     Options:
-      -v, --verbose  Display only if necessary
-      -d, --debug    Display all details
       -V, --version  show version and exit
       -h, --help     Show this message and exit.
 
