@@ -427,7 +427,7 @@ class Certificate:
         :param password:
         :return:
         """
-        if self.exists(os.path.join(self.p12_folder, p12), trigger_warning=False):
+        if self.exists(os.path.join(self.p12_folder, p12)):
             self.output("{f} already exists, abort".format(f=p12))
             return False
         else:
@@ -518,9 +518,10 @@ class Certificate:
         # Misconfigured level are high notifications
         else:
             self._logger.error("[!] Invalid level for message: {m}".format(m=msg))
-
         # Output to CLI if needed
-        if self._verbose and (level >= self._level):
+        if level == logging.WARNING:
+            click.echo("{m}\n".format(m=msg))
+        elif self._verbose and (level >= self._level):
             click.echo("{m}\n".format(m=msg))
 
         elif self._debug:
@@ -699,7 +700,7 @@ class Certificate:
             self.output("You must name your head column: '{c}' in the csv file: {f}".format(c=column, f=csv_file),
                         level=logging.ERROR)
 
-    def exists(self, path, trigger_error=False, trigger_warning=True):
+    def exists(self, path, trigger_error=False, trigger_warning=False):
         """
         Check if pat exist
         :param path:
