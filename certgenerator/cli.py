@@ -154,12 +154,16 @@ def read():
     """
     read config ini
     """
+    app_folder = None
     if tools.app_folder_exists():
+        app_folder = "\n\nApp folder : {p}\n".format(p=tools.app_folder)
         list_yaml = json.dumps(tools.read_yaml(), indent=2)
     else:
         list_yaml = "Create app folder using \"cert init\" or \"cert config edit\" before read or edit yaml file"
     click.echo("+++++config.ini+++++\n{c}".format(c=json.dumps(tools.config.get_all(), indent=2)))
-    click.echo("\n\n+++++csr.yaml+++++\n{y}".format(y=list_yaml))
+    if app_folder:
+        click.echo(app_folder)
+    click.echo("+++++csr.yaml+++++\n{y}".format(y=list_yaml))
 
 
 @config.command()
