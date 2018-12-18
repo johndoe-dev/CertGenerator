@@ -35,6 +35,16 @@ def global_options(argument="csr"):
     return inner_options
 
 
+def debug_options(f):
+    """Define debug options
+    """
+    options = [
+        click.option('-v', '--verbose', is_flag=True, help="Display only if necessary"),
+        click.option('-d', '--debug', is_flag=True, help="Display all details")
+    ]
+    return functools.reduce(lambda x, opt: opt(x), options, f)
+
+
 def folder_options(f):
     """Define certificate folder options and csv file
     """
@@ -68,3 +78,16 @@ def pass_logger(func):
     def wrapper(*args, **kwargs):
         return func(Tools().get_logger(), *args, **kwargs)
     return update_wrapper(wrapper, func)
+
+
+class RemoveOption(object):
+    def __init__(self, config, option):
+        self.option = option
+        self.config = config
+
+    def __enter__(self):
+        return self.option
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if not self.config.get_section(section="custom"):
+            self.config.remove_section(section="custom")
