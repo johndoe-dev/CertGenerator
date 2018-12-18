@@ -1,3 +1,14 @@
+v2.1.22 (2018-12-18)
+-------------------
+
+- Update cli.py
+	* Delete options 'debug' and 'verbose' for main command
+	* Add options 'debug' and 'verbose' for commands: 'create', 'create-multiple', 'create-p12', 'create_multiple_p12'
+	* Improve command 'delete' using context manager
+- Update decorators.py
+	* Add decorator 'debug_options'
+	* Add context manager RemoveOption()
+
 v2.1.21 (2018-12-18)
 -------------------
 
