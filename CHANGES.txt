@@ -1,3 +1,13 @@
+v2.1.20 (2018-12-18)
+-------------------
+
+- Update certificate.py
+	* function self.exists() => pass default value of trigger_warning to False
+	* function self.output() => display message if level == logging.WARNING
+- Update decorators.py
+	* decorator global_options() => add help fo --san option
+- Improve README
+
 v2.1.10 (2018-12-17)
 -------------------
 
