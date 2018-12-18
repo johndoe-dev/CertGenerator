@@ -17,7 +17,8 @@ def global_options(argument="csr"):
             click.option('-f', '--force', is_flag=True, help="Overwrite existing file"),
             click.option('-ks', '--key-size', type=click.Choice(['1024', '2048', '4096']),
                          help="Define key size", show_choices=True),
-            click.option('-sa', '--san', multiple=True, type=str),
+            click.option('-sa', '--san', multiple=True, type=str,
+                         help="Add Subject Alt Name (ex: --san test.com --san test1.com ...)"),
             click.option('-s', '--subject', is_flag=True, expose_value=False,
                          callback=callbacks.get_subject, help="define subject")
         ]
