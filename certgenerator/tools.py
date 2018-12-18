@@ -25,14 +25,14 @@ def edit_config(cert_folder, csv_file, _yaml):
     :return:
     """
     tools = Tools()
-    base_cert_directory = tools.app_folder
+    base_app_folder = tools.app_folder
     base_csv_file = tools.config.default_csv_file
 
     if cert_folder:
-        base_cert_directory = cert_folder
+        base_app_folder = cert_folder
 
     try:
-        tools.add_custom_folder(base_cert_directory, "cert_directory")
+        tools.add_custom_folder(base_app_folder, "app_folder")
     except BadPathException as e:
         tools.error(e)
     except NoFolderException as e:
@@ -178,8 +178,8 @@ class Tools:
         :return:
         """
         try:
-            if "cert_directory" in self.config.get_section(self.custom_section):
-                self.app_folder = self.config.get(self.custom_section, "cert_directory")
+            if "app_folder" in self.config.get_section(self.custom_section):
+                self.app_folder = self.config.get(self.custom_section, "app_folder")
                 self.csv_folder = os.path.join(self.app_folder, "csv")
                 self.yaml_file = os.path.join(self.app_folder, self.config.yaml_file.split("/")[-1])
         except KeyError:
