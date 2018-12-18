@@ -21,6 +21,7 @@ Getting started
 ~~~~~~~~~~~~~~~~~~~~~
 
 -  Click
+-  pyOpenSSL
 -  pycparser
 -  PyYAML
 
@@ -59,9 +60,8 @@ PRE-CONFIGURATION
 -----------------
 Configuration files
 ~~~~~~~~~~~~~~~~~~~
-**serial.csv**
 
-.. csv-table:: serial.csv
+.. csv-table:: **serial.csv**
    :header: "serial"
    :widths: 50
 
@@ -73,25 +73,27 @@ Configuration files
 
 
 Create default folder
+    * May require sudo
     * Default folder => **$HOME/Documents/CertGenerator/**
     * copy default csv file to **$HOME/Documents/CertGenerator/csv/serial.csv**
     * copy yaml file to **$HOME/Documents/CertGenerator/csr.yaml**
 
 ::
 
-    $ cert init
+    $ sudo cert init
 
 To change default folder or default csv:
+    * May require sudo
 
 ::
 
-    $ cert init -cert [path/of/folder] -csv [path/of/csv/file]
+    $ sudo cert init -cert [path/of/folder] -csv [path/of/csv/file]
 
 or
 
 ::
 
-    $ cert config edit -cert [path/of/folder] -csv [path/of/csv/file]
+    $ sudo cert config edit -cert [path/of/folder] -csv [path/of/csv/file]
 
 To edit yaml file:
     * Enter the desired subject
