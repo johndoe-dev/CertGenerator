@@ -218,12 +218,13 @@ class Certificate:
         else:
             self.output("=========== {} not generated ============".format(p12), level=logging.DEBUG)
 
-    def generate_multiple_p12(self, pem_folder, key_folder=None, csv_file=None, force=False):
+    def generate_multiple_p12(self, pem_folder, key_folder=None, csv_file=None, password="3z6F2Xfc", force=False):
         """
         Generate multiple p12 file
         :param pem_folder:
         :param key_folder:
         :param csv_file:
+        :param password:
         :param force:
         :return:
         """
@@ -250,7 +251,7 @@ class Certificate:
                 pem = os.path.join(pem_folder, name + ".pem")
                 p12 = name + ".p12"
                 if self.exists(key) and self.exists(pem):
-                    self.generate_p12(key=key, pem=pem, p12=p12, force=force)
+                    self.generate_p12(key=key, pem=pem, p12=p12, password=password, force=force)
 
     def get_csr_name(self):
         """
