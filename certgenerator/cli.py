@@ -114,7 +114,8 @@ def create_multiple(logger, ctx, csv_file, config, force, key_size, san, verbose
 @click.argument('name', type=str)
 @click.option('-p', '--pem', type=str)
 @click.option('-k', '--key', type=str)
-@click.option('-pass', '--password', type=str, hide_input=True, help="Define password, default is '3z6F2Xfc'")
+@click.option('-pass', '--password', type=str, hide_input=True, help="Define password, default is '3z6F2Xfc'",
+              default="3z6F2Xfc")
 @decorators.global_options("p12")
 @decorators.debug_options
 def create_p12(logger, ctx, name, pem, key, password, config, force, verbose, debug):
@@ -139,10 +140,7 @@ def create_p12(logger, ctx, name, pem, key, password, config, force, verbose, de
     tools.set_options(ctx=ctx, config=config, verbose=verbose, debug=debug)
 
     cert = Certificate(logger=logger, opts=tools.opts)
-    if password:
-        cert.generate_p12(key=key, pem=pem, p12=name, password=password, force=force)
-    else:
-        cert.generate_p12(key=key, pem=pem, p12=name, force=force)
+    cert.generate_p12(key=key, pem=pem, p12=name, password=password, force=force)
 
 
 @main.command(short_help="Create multiple p12")
@@ -153,9 +151,11 @@ def create_p12(logger, ctx, name, pem, key, password, config, force, verbose, de
 @click.option('-k', '--key-folder', type=str,
               help="Define key folder where all the key are located,"
                    " if not defined, it will search key in certificate folder")
+@click.option('-pass', '--password', type=str, hide_input=True, help="Define password, default is '3z6F2Xfc'",
+              default="3z6F2Xfc")
 @decorators.global_options("p12")
 @decorators.debug_options
-def create_multiple_p12(logger, ctx, csv_file, pem_folder, key_folder, config, force, verbose, debug):
+def create_multiple_p12(logger, ctx, csv_file, pem_folder, key_folder, password, config, force, verbose, debug):
     """
     Create multiple p12 using csv file
     \f
@@ -165,6 +165,7 @@ def create_multiple_p12(logger, ctx, csv_file, pem_folder, key_folder, config, f
     :param csv_file:
     :param pem_folder:
     :param key_folder:
+    :param password:
     :param config:
     :param force:
     :param verbose:
@@ -175,9 +176,10 @@ def create_multiple_p12(logger, ctx, csv_file, pem_folder, key_folder, config, f
 
     cert = Certificate(logger, opts=tools.opts)
     if csv_file:
-        cert.generate_multiple_p12(csv_file=csv_file, pem_folder=pem_folder, key_folder=key_folder, force=force)
+        cert.generate_multiple_p12(csv_file=csv_file, pem_folder=pem_folder,
+                                   key_folder=key_folder, password=password, force=force)
     else:
-        cert.generate_multiple_p12(pem_folder=pem_folder, key_folder=key_folder, force=force)
+        cert.generate_multiple_p12(pem_folder=pem_folder, key_folder=key_folder, password=password, force=force)
 
 
 @main.command()
